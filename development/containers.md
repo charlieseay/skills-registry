@@ -1,3 +1,30 @@
+---
+name: containers
+category: development
+description: Work with Docker containers and compose files
+triggers:
+  patterns:
+  - docker
+  - container
+  - compose
+  - docker-compose
+  contexts:
+  - deployment
+  - infrastructure
+  - development
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when work with docker containers and compose files
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Manage Docker containers on your home lab via MCP tools.
 
 ## Usage

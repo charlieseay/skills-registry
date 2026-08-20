@@ -1,3 +1,30 @@
+---
+name: tailor
+category: development
+description: Tailor code and configs to specific requirements
+triggers:
+  patterns:
+  - tailor
+  - customize
+  - adapt
+  - configure
+  contexts:
+  - customization
+  - configuration
+  - adaptation
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when tailor code and configs to specific requirements
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 20
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Tailor a resume to match a specific job description using AI keyword optimization.
 
 ## Usage

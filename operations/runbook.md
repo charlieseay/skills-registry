@@ -1,3 +1,30 @@
+---
+name: runbook
+category: operations
+description: Create operational runbook with procedures and rollback
+triggers:
+  patterns:
+  - runbook
+  - SOP
+  - procedure
+  - operational guide
+  contexts:
+  - operations
+  - documentation
+  - procedures
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when create operational runbook with procedures and rollback
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 30
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Generate an operational runbook note in the current working directory.
 
 ## Usage

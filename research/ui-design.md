@@ -1,3 +1,29 @@
+---
+name: ui-design
+category: research
+description: Design user interfaces with best practices
+triggers:
+  patterns:
+  - UI design
+  - interface design
+  - user interface
+  contexts:
+  - design
+  - UX
+  - frontend
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when design user interfaces with best practices
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 60
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # UI Design
 
 Generate high-craft, pixel-perfect frontend interfaces following the Seaynic Labs Design System.

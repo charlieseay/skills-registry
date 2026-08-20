@@ -1,3 +1,29 @@
+---
+name: session-check
+category: operations
+description: Session health check and status review
+triggers:
+  patterns:
+  - session check
+  - status check
+  - health check
+  contexts:
+  - monitoring
+  - health check
+  - status
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when session health check and status review
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 5
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Enforce golden rules and query the Rules Registry at session start.
 
 ## Usage

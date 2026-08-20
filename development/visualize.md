@@ -1,3 +1,29 @@
+---
+name: visualize
+category: development
+description: Visualize codebase architecture and dependencies
+triggers:
+  patterns:
+  - visualize
+  - codebase map
+  - dependency graph
+  contexts:
+  - documentation
+  - architecture
+  - onboarding
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when visualize codebase architecture and dependencies
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 25
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Analyze a project's codebase and generate an interactive component map showing how pieces connect, where data flows, and where gaps exist.
 
 ## Usage

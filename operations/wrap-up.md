@@ -1,3 +1,30 @@
+---
+name: wrap-up
+category: operations
+description: End-of-session retrospective and handoff
+triggers:
+  patterns:
+  - wrap up
+  - end session
+  - session wrap
+  - retrospective
+  contexts:
+  - session management
+  - retrospective
+  - handoff
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when end-of-session retrospective and handoff
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Close out the session properly: retrospective first, then knowledge capture, then notes, then checkpoint. `/checkpoint` is a save point you hit constantly mid-session; `/wrap-up` is the true end-of-session ritual and should run once.
 
 **Trigger phrases:** "let's wrap up", "wrap up", "/wrap-up", "call it a day/night".

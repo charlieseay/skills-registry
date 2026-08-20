@@ -1,3 +1,30 @@
+---
+name: meeting-notes
+category: operations
+description: Structured meeting notes with decisions and action items
+triggers:
+  patterns:
+  - meeting notes
+  - notes
+  - meeting minutes
+  - capture meeting
+  contexts:
+  - meetings
+  - documentation
+  - collaboration
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when structured meeting notes with decisions and action items
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 10
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Create structured meeting notes in the current vault or working directory.
 
 ## Usage

@@ -1,3 +1,30 @@
+---
+name: color-palette
+category: creative
+description: Generate cohesive color palettes for brands and designs
+triggers:
+  patterns:
+  - color palette
+  - brand colors
+  - color scheme
+  - design colors
+  contexts:
+  - branding
+  - design system
+  - visual identity
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when generate cohesive color palettes for brands and designs
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 5
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Color Palette Generation
 
 Professional color palette generation with accessibility validation and CSS output.

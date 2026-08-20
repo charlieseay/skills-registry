@@ -1,3 +1,25 @@
+---
+name: checkpoint
+category: development
+description: Checkpoint skill
+triggers:
+  patterns:
+  - checkpoint
+  contexts:
+  - development
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when checkpoint skill
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Create a Git checkpoint — stage and commit changes across all tracked repos, then push to GitHub.
 
 ## Quick Start

@@ -1,3 +1,30 @@
+---
+name: n8n
+category: development
+description: Work with n8n workflows (debug, create, deploy)
+triggers:
+  patterns:
+  - n8n
+  - workflow
+  - automation
+  - n8n workflow
+  contexts:
+  - automation
+  - integration
+  - workflows
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when work with n8n workflows (debug, create, deploy)
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 30
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Manage n8n workflows from the command line — list, backup, health check, test, logs, and status control.
 
 ## Usage

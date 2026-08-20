@@ -1,3 +1,30 @@
+---
+name: brainstorm
+category: research
+description: Structured brainstorming session with idea generation
+triggers:
+  patterns:
+  - brainstorm
+  - ideate
+  - generate ideas
+  - creative session
+  contexts:
+  - ideation
+  - planning
+  - creativity
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when structured brainstorming session with idea generation
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 30
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Brainstorm — Multi-Agent Idea Analysis
 
 Run an idea through 7 specialized AI agent personas for comprehensive, multi-perspective analysis.

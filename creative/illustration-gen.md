@@ -1,3 +1,29 @@
+---
+name: illustration-gen
+category: creative
+description: Generate custom illustrations for products and marketing
+triggers:
+  patterns:
+  - illustration
+  - custom artwork
+  - visual asset
+  contexts:
+  - marketing
+  - product design
+  - content creation
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when generate custom illustrations for products and marketing
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 25
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Illustration Generation
 
 Generate high-quality illustrations with optional vector conversion for editorial use, hero images, and visual storytelling.

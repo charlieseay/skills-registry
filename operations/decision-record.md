@@ -1,3 +1,30 @@
+---
+name: decision-record
+category: operations
+description: Create lightweight architecture decision record (ADR)
+triggers:
+  patterns:
+  - decision record
+  - ADR
+  - architecture decision
+  - document decision
+  contexts:
+  - documentation
+  - decision tracking
+  - architecture
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when create lightweight architecture decision record (adr)
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Create a lightweight Architecture Decision Record (ADR) in a `Decisions/` folder.
 
 ## Usage

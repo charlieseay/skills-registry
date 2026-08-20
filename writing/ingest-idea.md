@@ -1,3 +1,30 @@
+---
+name: ingest-idea
+category: writing
+description: Capture and structure new ideas into vault
+triggers:
+  patterns:
+  - capture idea
+  - new idea
+  - ingest idea
+  - save thought
+  contexts:
+  - ideation
+  - knowledge capture
+  - note-taking
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when capture and structure new ideas into vault
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 5
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Ingest Idea
 
 Ingest a video or idea URL, fetch its transcript, run a full feasibility assessment, match to active projects, and create a task if buildable.

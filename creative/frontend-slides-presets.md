@@ -1,3 +1,25 @@
+---
+name: frontend-slides-presets
+category: creative
+description: Frontend Slides Presets skill
+triggers:
+  patterns:
+  - frontend slides presets
+  contexts:
+  - creative
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when frontend slides presets skill
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Style Presets Reference
 
 Curated visual styles for Frontend Slides. Each preset is inspired by real design references—no generic "AI slop" aesthetics. **Abstract shapes only—no illustrations.**

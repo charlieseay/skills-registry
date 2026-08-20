@@ -1,3 +1,30 @@
+---
+name: brand-name
+category: creative
+description: Generate creative brand names with domain availability checking
+triggers:
+  patterns:
+  - brand name
+  - company name
+  - product name
+  - naming
+  contexts:
+  - branding
+  - naming
+  - product launch
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when generate creative brand names with domain availability checking
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 10
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Brand Name Research & Strategy Agent
 
 Research a candidate app name for conflicts, then develop a full brand strategy including name variants, color palettes, typography direction, and positioning.

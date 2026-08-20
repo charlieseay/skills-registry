@@ -1,3 +1,32 @@
+---
+name: animation-web
+category: creative
+description: Create animation-rich HTML presentations and web experiences
+triggers:
+  patterns:
+  - animate
+  - animation
+  - animated presentation
+  - motion design
+  - web animation
+  contexts:
+  - presentation
+  - frontend
+  - visual design
+  - marketing
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when create animation-rich html presentations and web experiences
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Web Animation Code Generation
 
 Generate production-ready CSS and JavaScript animation code following motion design principles.

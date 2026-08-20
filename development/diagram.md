@@ -1,3 +1,30 @@
+---
+name: diagram
+category: development
+description: Create technical diagrams (architecture, flows, sequences)
+triggers:
+  patterns:
+  - diagram
+  - architecture diagram
+  - flow chart
+  - sequence diagram
+  contexts:
+  - documentation
+  - architecture
+  - design
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when create technical diagrams (architecture, flows, sequences)
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Create a draw.io (.drawio) diagram file based on the user's description.
 
 ## Usage

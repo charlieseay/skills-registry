@@ -1,3 +1,29 @@
+---
+name: clone
+category: development
+description: Clone a GitHub repository into ~/Projects/ using gh CLI
+triggers:
+  patterns:
+  - clone repo
+  - clone github
+  - get repository
+  contexts:
+  - development
+  - setup
+  - onboarding
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when clone a github repository into ~/projects/ using gh cli
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 2
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Clone a GitHub repository into ~/Projects/ using the gh CLI.
 
 ## Usage

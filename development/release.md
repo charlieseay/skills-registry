@@ -1,3 +1,30 @@
+---
+name: release
+category: development
+description: Prepare and execute a software release
+triggers:
+  patterns:
+  - release
+  - deploy
+  - ship
+  - go live
+  contexts:
+  - deployment
+  - release management
+  - production
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when prepare and execute a software release
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 30
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Automate the full product release pipeline — test, build, package, publish, update Homebrew tap, and record in the vault.
 
 ## Usage

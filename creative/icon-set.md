@@ -1,3 +1,30 @@
+---
+name: icon-set
+category: creative
+description: Generate cohesive icon sets for UIs and brand systems
+triggers:
+  patterns:
+  - icon set
+  - icons
+  - UI icons
+  - icon design
+  contexts:
+  - design system
+  - UI design
+  - branding
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when generate cohesive icon sets for uis and brand systems
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 20
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Icon Set Generation
 
 Generate cohesive SVG icon libraries with consistent style, optimized for web/mobile use.

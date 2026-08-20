@@ -1,3 +1,30 @@
+---
+name: decompose
+category: development
+description: Decompose large tasks into smaller, manageable subtasks
+triggers:
+  patterns:
+  - decompose
+  - break down
+  - split task
+  - subtasks
+  contexts:
+  - planning
+  - project management
+  - task breakdown
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when decompose large tasks into smaller, manageable subtasks
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 10
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Decompose Task Skill
 
 Manually decompose a large task into phase-linked subtasks.

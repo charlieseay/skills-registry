@@ -1,3 +1,29 @@
+---
+name: quarterly-review
+category: operations
+description: Quarterly retrospective and planning session
+triggers:
+  patterns:
+  - quarterly review
+  - Q review
+  - quarter retrospective
+  contexts:
+  - planning
+  - retrospective
+  - strategy
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when quarterly retrospective and planning session
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 120
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # quarterly-review
 
 Runs the quarterly infrastructure review process: assesses spend optimization and architecture improvements.

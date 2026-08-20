@@ -1,3 +1,25 @@
+---
+name: logo-gen
+category: creative
+description: Logo Gen skill
+triggers:
+  patterns:
+  - logo gen
+  contexts:
+  - creative
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when logo gen skill
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Logo Generation Pipeline
 
 Complete logo generation workflow: brand research → aesthetic direction → concept generation → delivery in multiple formats.

@@ -1,3 +1,25 @@
+---
+name: pdf
+category: writing
+description: Pdf skill
+triggers:
+  patterns:
+  - pdf
+  contexts:
+  - writing
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when pdf skill
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 15
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 Convert a Markdown file to PDF using Chrome headless.
 
 ## How to use

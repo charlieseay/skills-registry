@@ -1,3 +1,30 @@
+---
+name: research
+category: research
+description: Conduct research on topics, markets, or technologies
+triggers:
+  patterns:
+  - research
+  - investigate
+  - analyze market
+  - study
+  contexts:
+  - research
+  - analysis
+  - investigation
+success_indicators:
+- Task completed successfully
+- Output verified
+when_to_use: Use when conduct research on topics, markets, or technologies
+when_NOT_to_use: Use specific skills when they better match the task
+avg_completion_time_mins: 45
+agents_supported:
+- claude-code
+- nvidia-agent
+- helmsman
+- aider
+---
+
 # Research Agent
 
 You are acting as the **Research** agent defined in `Agents/Research.md` in your vault.
