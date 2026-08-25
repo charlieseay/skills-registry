@@ -87,7 +87,7 @@ Check: if `/config/workspace` exists, use container paths. Otherwise, use Mac pa
 
 | Repo | Mac Path | Container Path | What it tracks |
 |------|----------|----------------|----------------|
-| ~~SeaynicNet vault~~ | — | — | **NOT git-backed (2026-06-24). iCloud Sync is the backup.** Git commits conflict with Docker VirtioFS — containers (vault-mcp) bind-mount the vault incl. `.git`, blocking `index.lock` creation. Do NOT checkpoint the vault to GitHub. |
+| SeaynicNet vault | `/Users/charlieseay/Library/Mobile Documents/iCloud~md~obsidian/Documents/SeaynicNet` | — | Vault notes, `Projects/`, `Agents/`, `Standards/`. **IS git-backed** → `github.com/charlieseay/seaynicnet` (private). Corrected 2026-08-21 — the previous 'NOT git-backed / VirtioFS conflict' note was stale: verified 69 commits in 8h, 6,658 tracked files, no index.lock failures. |
 | charlieseay.com | `/Users/charlieseay/Projects/charlieseay.com` | `/config/workspace/Projects/charlieseay.com` | Full Astro site source |
 | Enchapter | `/Users/charlieseay/Projects/StoryChat` | `/config/workspace/Projects/StoryChat` | Full iOS app source (Xcode project folder stays as StoryChat) |
 | Enchapter Site | `/Users/charlieseay/Projects/enchapter-site` | `/config/workspace/Projects/enchapter-site` | Product page (static Astro site) |

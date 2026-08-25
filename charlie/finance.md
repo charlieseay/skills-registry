@@ -66,65 +66,65 @@ async def main():
         # Calculate grand total
         grand_total = stripe_total + mercury_total
         
-        # Display formatted overview as rich HTML
+        # Display formatted overview as rich HTML with dark theme
         html = f"""
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto;">
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-        <h2 style="margin: 0; font-size: 24px; font-weight: 600;">SEAYNIC LABS LLC</h2>
-        <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Financial Overview</p>
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; max-height: 600px; overflow-y: auto;">
+    <div style="background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+        <h2 style="margin: 0; font-size: 20px; font-weight: 600;">SEAYNIC LABS LLC</h2>
+        <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">Financial Overview</p>
     </div>
     
-    <div style="background: #ffffff; padding: 32px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: #1a202c; padding: 24px; border-radius: 0 0 8px 8px; border: 1px solid #2d3748;">
         <!-- Total -->
-        <div style="text-align: center; padding: 24px; background: #f7fafc; border-radius: 8px; margin-bottom: 32px;">
-            <div style="font-size: 14px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Total Across All Accounts</div>
-            <div style="font-size: 42px; font-weight: 700; color: #2d3748;">${grand_total:,.2f}</div>
+        <div style="text-align: center; padding: 20px; background: #2d3748; border-radius: 6px; margin-bottom: 24px;">
+            <div style="font-size: 12px; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Total Across All Accounts</div>
+            <div style="font-size: 36px; font-weight: 700; color: #48bb78;">${grand_total:,.2f}</div>
         </div>
         
         <!-- Stripe Section -->
-        <div style="margin-bottom: 32px;">
-            <h3 style="font-size: 16px; font-weight: 600; color: #635bff; margin: 0 0 16px 0; display: flex; align-items: center;">
-                <span style="display: inline-block; width: 32px; height: 32px; background: #635bff; border-radius: 6px; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">S</span>
+        <div style="margin-bottom: 24px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #9f7aea; margin: 0 0 12px 0; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 28px; height: 28px; background: #9f7aea; border-radius: 6px; margin-right: 10px; text-align: center; line-height: 28px; color: white; font-size: 16px;">S</span>
                 Stripe Payments
             </h3>
-            <div style="padding-left: 44px;">
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">Available</span>
-                    <span style="font-weight: 600; color: #2d3748;">${stripe_avail:,.2f}</span>
+            <div style="padding-left: 38px;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d3748;">
+                    <span style="color: #a0aec0;">Available</span>
+                    <span style="font-weight: 600; color: #e2e8f0;">${stripe_avail:,.2f}</span>
                 </div>
-                {"" if stripe_pending == 0 else f'''<div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">Pending</span>
-                    <span style="font-weight: 600; color: #2d3748;">${stripe_pending:,.2f}</span>
+                {"" if stripe_pending == 0 else f'''<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d3748;">
+                    <span style="color: #a0aec0;">Pending</span>
+                    <span style="font-weight: 600; color: #e2e8f0;">${stripe_pending:,.2f}</span>
                 </div>'''}
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
-                    <span style="color: #2d3748;">Subtotal</span>
-                    <span style="color: #635bff;">${stripe_total:,.2f}</span>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; font-weight: 600;">
+                    <span style="color: #e2e8f0;">Subtotal</span>
+                    <span style="color: #9f7aea;">${stripe_total:,.2f}</span>
                 </div>
             </div>
         </div>
         
         <!-- Mercury Section -->
-        <div style="margin-bottom: 24px;">
-            <h3 style="font-size: 16px; font-weight: 600; color: #0066ff; margin: 0 0 16px 0; display: flex; align-items: center;">
-                <span style="display: inline-block; width: 32px; height: 32px; background: #0066ff; border-radius: 6px; margin-right: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">M</span>
+        <div style="margin-bottom: 20px;">
+            <h3 style="font-size: 14px; font-weight: 600; color: #4299e1; margin: 0 0 12px 0; display: flex; align-items: center;">
+                <span style="display: inline-block; width: 28px; height: 28px; background: #4299e1; border-radius: 6px; margin-right: 10px; text-align: center; line-height: 28px; color: white; font-size: 16px;">M</span>
                 Mercury Bank
             </h3>
-            <div style="padding-left: 44px;">
-                {"".join([f'''<div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
-                    <span style="color: #4a5568;">{acc.get("type", "Account").replace("mercury", "").strip().title()} ••{acc.get("name", "").split("••")[-1] if "••" in acc.get("name", "") else acc.get("name", "")}</span>
-                    <span style="font-weight: 600; color: #2d3748;">${acc.get("balance", 0):,.2f}</span>
+            <div style="padding-left: 38px;">
+                {"".join([f'''<div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2d3748;">
+                    <span style="color: #a0aec0;">{acc.get("type", "Account").replace("mercury", "").strip().title()} ••{acc.get("name", "").split("••")[-1] if "••" in acc.get("name", "") else acc.get("name", "")}</span>
+                    <span style="font-weight: 600; color: #e2e8f0;">${acc.get("balance", 0):,.2f}</span>
                 </div>''' for acc in mercury_accounts if acc.get("balance", 0) > 0])}
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600;">
-                    <span style="color: #2d3748;">Subtotal</span>
-                    <span style="color: #0066ff;">${mercury_total:,.2f}</span>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; font-weight: 600;">
+                    <span style="color: #e2e8f0;">Subtotal</span>
+                    <span style="color: #4299e1;">${mercury_total:,.2f}</span>
                 </div>
             </div>
         </div>
         
         <!-- Footer -->
-        <div style="border-top: 2px solid #e2e8f0; padding-top: 20px; margin-top: 32px;">
-            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700;">
-                <span style="color: #2d3748;">Liquid Assets (Total)</span>
+        <div style="border-top: 2px solid #2d3748; padding-top: 16px; margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+                <span style="color: #e2e8f0;">Liquid Assets (Total)</span>
                 <span style="color: #48bb78;">${grand_total:,.2f}</span>
             </div>
         </div>
