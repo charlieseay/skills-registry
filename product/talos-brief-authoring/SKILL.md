@@ -229,10 +229,26 @@ restart to pick up a code change (see below).
    the variable. Trace the actual gate code per step 1 above before
    burning further submission attempts.
 
+## Known trap: `check_expected_output`'s vague-claims word list has no negation awareness
+
+Same class of bug as the phase-mixing checks above, found while filing
+the real-estate-CRM pilot's phase-1 design brief (2026-09-22, not yet
+fixed — flagged here so the next person doesn't re-diagnose it). The
+Expected Output section flags `complete|working|done|finished|successful`
+as "vague completion claims," but has no negation awareness: a scope
+clarification like "this is a design document, not working code" trips
+it on the bare word "working," even though the sentence is stating what
+the task does NOT produce, which is exactly the kind of precise scope
+boundary this section is supposed to reward. Workaround for now: avoid
+these five words entirely in Expected Output, including in negated form
+— reword "not working code" as "a design document only; the real build
+happens in a separate task" rather than fight the checker.
+
 ## Filing checklist
 
 - [ ] `## Goal`, `## Context`, `## Steps`, `## Verification`, `## Expected Output` all present, in that order.
 - [ ] Steps: research (read/fetch/find/etc.) before the first build/write/create step.
+- [ ] Expected Output: avoid complete/working/done/finished/successful entirely, even negated (see trap above).
 - [ ] Verification: a fenced bash block with a real pass/fail check AND a negative control.
 - [ ] Expected Output: exact paths/fields/codes, not vague language.
 - [ ] Every path uses the owner's allowed convention (tilde-relative for TALOS, no literal `charlieseay/` segments, no `/Volumes/data/secrets`).
