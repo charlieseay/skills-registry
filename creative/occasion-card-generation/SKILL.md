@@ -89,17 +89,39 @@ Choose the path that fits your constraints (headless autonomy requirement, timel
 - Scriptable for batch production (multiple card variants in one run)
 
 **Weaknesses:**
-- Requires hand-authored SVG illustrations (not auto-generated)
+- Hand-authored SVG illustrations are quick to build but genuinely look like cheap clip art next to real illustration — confirmed directly by Charlie on the first version of the birthday card ("the graphics are sub par quality... not generic clip art that looks cheap") after simple geometric-primitive SVGs (ellipses, circles, basic paths for a "flower" and "laurel") were used as the centerpiece illustration. This is a REAL, recurring quality ceiling of pure hand-authored SVG for anything meant to look like fine illustration, not solved by trying harder at hand-drawing SVG paths.
 - CSS print support varies slightly across Chromium versions (test the exact output before shipping)
-- Not suitable for photo-realistic or highly complex illustration styles (SVG is vector-focused)
+- Not suitable for photo-realistic illustration styles (SVG is vector-focused)
 
-**When to use:**
-- Talos autonomous execution required
-- Illustrations are simplified/line-art/geometric (botanical stems, geometric patterns, flat icons, typography-heavy designs)
-- High volume of variants needed (dozens of cards)
+**When to use pure hand-authored SVG (no Canva hybrid):**
+- Talos fully headless execution with no human in the loop at all
+- The illustration is genuinely simple/geometric by design (a status icon, a data-viz shape, a UI element) — not a stand-in for "real" illustration
+- High volume of variants needed with zero human touch time
+
+**Fix for the clip-art-quality problem — the Canva-hybrid variant of Path A (proven 2026-09-22, requires a human-supervised session):**
+
+The illustration-quality gap is solved by generating the actual artwork in Canva (which produces genuinely good hand-drawn-style illustration, not geometric primitives), exporting it as a flat PNG, then compositing it into the SAME deterministic HTML/CSS/Playwright pipeline as before. This keeps full control over typography, exact print dimensions, and text variants while getting real illustration quality for the visual centerpiece:
+
+1. `generate-design` with `design_type: "logo"` (not `"card"` — a card design type composites a background you can't cleanly strip; `logo` produces an isolated illustration on a plain background) and a prompt describing an isolated illustration ("...on a plain white background, centered, no card layout, no text, no decorative border — just the illustration itself").
+2. View candidates via `read-design` with `filter.fields: ["thumbnails"]` — this renders inline directly in the response. (Earlier attempts to `curl` the raw `thumbnail.url` from `generate-design`'s response failed — those URLs return an HTML viewer shell requiring session auth, not a raw image. `read-design`/`export-design` return real, curl-able signed URLs.)
+3. `create-design-from-candidate` to convert the chosen candidate into a real design ID.
+4. `export-design` with `format: {"type": "png", "width": 800}`. **Note:** `transparent_background: true` did NOT actually produce alpha transparency in testing (export came back as RGB, not RGBA, background baked in as flat white) — this may be a Canva API limitation for this design type, not something fixable by retrying the flag.
+5. Download the PNG, then chroma-key the flat background to true transparency with plain PIL (no ML model, no `rembg` needed — the background is a known flat color, not a photo):
+   ```python
+   from PIL import Image
+   img = Image.open("raw_export.png").convert("RGBA")
+   data = img.getdata()
+   new_data = [(r, g, b, 0) if (r > 245 and g > 245 and b > 245) else (r, g, b, a) for r, g, b, a in data]
+   img.putdata(new_data)
+   img.save("keyed.png")
+   ```
+   Verify by compositing onto a NON-white test background before trusting it — a keyed asset can look fine on white and still show a visible box on any other background color if the threshold was too tight or the source had anti-aliased edges near the flat color.
+6. Reference the keyed PNG the same way an inline SVG would have been referenced (`<img src="keyed.png">`) in the same HTML/CSS templates from the pure-SVG version above — no other pipeline changes needed.
+
+**This hybrid is NOT autonomous end-to-end** — step 1-4 require a human-supervised Canva-connected session (same auth limitation as Path B below), so it doesn't work for a fully headless Talos run today. Steps 5-6 (chroma-key + composite + render) are fully scriptable/headless once the illustration asset exists. Practical implication: a human (or human-supervised Claude session) generates the illustration asset(s) once, then Talos can reuse that same asset file across many text/copy variants autonomously — the illustration-generation step is the one part of the pipeline that currently needs a human in the loop for genuinely good visual quality.
 
 **Reference pattern:**
-- Birthday card bundle example (2026-09-22): 4 cards (3 text variants + 1 color palette variant), all using the same botanical SVG stem motif, rendered to both PDF (print) and PNG (preview) via this method. Actual working code available if needed.
+- Birthday card bundle example (2026-09-22): 4 cards (3 text variants + 1 color palette variant). V1 used hand-authored SVG (flat, cheap-looking, rejected). V2 used the Canva-hybrid technique above (a botanical stem illustration + a laurel wreath illustration, both Canva-generated, chroma-keyed, composited into the same HTML/CSS layout) — confirmed genuinely higher quality on direct review. Actual working code available if needed.
 
 **Extension — animated eCards (proven same session, 2026-09-22):** the same HTML/CSS approach supports CSS `@keyframes` animation (pop-in illustrations, falling confetti via randomized `animation-delay`/`animation-duration`, staggered text reveal). Playwright can capture this as a real video file with zero extra tooling:
 
