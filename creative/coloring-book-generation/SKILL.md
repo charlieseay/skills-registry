@@ -233,8 +233,10 @@ This is suitable for human-supervised batches, fully repeatable.
 ### Gotcha 2: Passing signed URLs to bash `curl`
 **DON'T.** Special characters in the URL (`&`, `%2F`, `=`, etc.) are mangled by shell escaping, causing `SignatureDoesNotMatch` errors. Use Python's `requests.get(url)` instead.
 
-### Gotcha 3: Shipping only PDF (or only PNG)
+### Gotcha 3: Shipping only PDF (or only PNG) — now caught mechanically
 **DON'T.** Dual format is the market baseline for coloring books. Print-ready PDF + high-res PNG for tablet apps are both standard. Include both in every product.
+
+This exact gap shipped for real on product-item-177 (page-3-village.png was silently never exported while its PDF existed) — `qa_gate.py`'s `check_dual_format_pairing` (added 2026-09-22) now fails the gate if any PDF page lacks a matching PNG basename or vice versa. It was only caught the first time by a human listing both directories by hand; don't rely on that a second time — trust the gate check, but still glance at both directory listings before zipping if you're doing this manually.
 
 ### Gotcha 4: Sparse line art masquerading as a finished design
 **DON'T.** A page with 5-10 large regions reads as children's coloring, not adult premium. Adult coloring books must have genuinely intricate detail — many small regions, complex line work, real coloring challenge. If the generated page is sparse, pick a different candidate or regenerate with a more detailed prompt.
