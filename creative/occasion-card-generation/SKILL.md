@@ -5,7 +5,7 @@ category: "creative"
 metadata:
   version: "1.0.0"
   agents: ["any"]
-  related_skills: ["digital-product-quality-bar", "talos-product-launch-audit", "color-palette", "gemini-svg-creator", "notion-template-api-build"]
+  related_skills: ["digital-product-quality-bar", "talos-product-launch-audit", "color-palette", "gemini-svg-creator", "notion-template-api-build", "branching-narrative-pdf"]
 ---
 
 # Occasion Card Generation — Multi-Path Product Blueprint
@@ -19,6 +19,8 @@ On 2026-09-22, the question was: "Can Talos autonomously generate occasion-card 
 1. **Canva MCP is not a headless option** — Canva's OAuth-only auth model requires human user consent and periodic token refresh, making it unsuitable for autonomous Talos subprocess execution. (Canva MCP tools ARE available in interactive Claude sessions via claude.ai connectors, but not in headless pipeline contexts.)
 
 2. **Headless HTML/CSS→Playwright→PDF/PNG pipeline is proven and repeatable** — A real 4-card birthday bundle was built this way: hand-authored inline SVG illustrations + HTML/CSS template, rendered via Playwright to print-ready PDF (`page.pdf()` with print_background=True) and preview PNG (`page.screenshot()`). Zero external APIs, deterministic output in ~1s/card, genuinely automatable by Talos.
+
+   **If this pipeline is ever extended to a multi-page document** (a multi-card bundle in one PDF, a booklet, anything where a reader needs to navigate between labeled pages) rather than one-card-per-file: read `branching-narrative-pdf` first. It documents a real, serious defect found in exactly that situation — a CSS `min-height` taller than the actual printable page area (page size minus `@page` margins) silently split each logical page across two physical PDF pages, breaking page-number references for the reader. Single-page card products aren't exposed to this (no page-to-page navigation contract to break), but any multi-page extension of this pipeline is.
 
 Occasion cards are a legitimate high-volume product category with real demand (birthday, office humor, congratulations, get-well, team morale, event RSVPs — thousands of micro-product opportunities), but they have a specific quality failure mode: a technically-designed card that uses flat geometric placeholders instead of real illustrated content reads as an unfinished template, not a sellable product. This skill documents that failure mode alongside the working design paths, so future agents building card products know to self-check before declaring "done."
 
