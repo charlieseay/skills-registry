@@ -115,12 +115,25 @@ wrong in ways a structural check won't catch).
 
 ## Scaling to a real product batch
 
-For a genuine multi-item product (not a single demo page), generalize
-`render_layout.py` to accept the HTML/CSS as a parameter (a template
-function, not a hardcoded string) and loop it per page, and
-`add_form_fields.py` to accept input/output paths as parameters instead of
-hardcoded `/tmp/...` paths — neither script does this yet as of
-2026-09-24. Whoever builds the first real multi-page product with this
-pipeline should do that generalization as part of the build, and update
-this skill's scripts/ with the parameterized versions rather than leaving
-per-product copies scattered in /tmp.
+`scripts/add_form_fields.py` is now generalized (as of 2026-09-24, first
+proven on the Monthly Budget Planner product): it reads a multi-page
+`pdf-form-fields.json` (`{"pages": [{"name", "pdf_path", "page_w_in",
+"page_h_in", "margin_in", "rects"}, ...]}`), namespaces every field as
+`<page_name>__<field_name>` to avoid collisions across pages, and infers
+text vs. checkbox by a `TEXT_FIELD_HINTS` substring list instead of a fixed
+2-name allowlist — extend that list (or add a real `/Btn` branch back) for a
+product with checkboxes. Call it as `add_form_fields.py <input_dir>
+<output_path>`.
+
+`render_layout.py` is still per-product on purpose — its HTML/CSS *is* the
+product's design, so it doesn't belong in the shared skill. Build a new
+product's own copy structured like
+`digital-products/product-item-<N>-<slug>/phase-1/render_layout.py`: a
+`main(out_dir)` that iterates a `PAGES` list of `(page_name, html)` tuples
+and calls `page.pdf()` + the `[data-field]` DOM-coordinate capture once per
+page, writing a combined `pdf-form-fields.json` in the multi-page shape
+above. See `digital-products/product-item-175-budget-planner/phase-1/` for
+a full worked example (13 pages, 494 real fields, yearly overview + 12
+monthly detail pages with a shared HTML template function parameterized by
+month name) — copy its `PAGES`-list/`main()` structure for the next
+multi-page product rather than re-deriving it.
