@@ -361,3 +361,63 @@ or scheduled runs:
   generator so it stops happening is separate, deeper engineering work —
   but if the same leaked-artifact pattern shows up more than once, flag it
   as a pipeline bug worth root-causing, not just a per-product fix.
+
+## Preview-image coverage — detect before you deactivate
+
+**Found 2026-09-24: 42 of 87 products (48% of the catalog) claim a page/design
+count in their listing copy that isn't backed by enough preview images** —
+e.g. "6 Printable Designs" / "13 pages" with 0-1 actual images in
+`phase-3/preview-mockups/`. Two of those were live on Etsy at the time
+(Travel & Wine Regions: 1 image for a 6-page claim; Engineering & Blueprint:
+4 images for the same claim) — the real deliverable content was genuinely
+complete in both cases (all pages built correctly, PDF+PNG), the gap was
+purely on the Etsy-facing preview side. `qa_gate.py` returned a clean PASS on
+both before this was caught, because nothing compared claimed count against
+preview-image count.
+
+`qa_gate.py`'s `check_preview_image_coverage()` (added 2026-09-24) closes the
+LOCAL half of this gap mechanically: it extracts the largest page/design
+count claimed in `phase-3/*listing*.md`, counts images in
+`phase-3/preview-mockups/`, and fails if the count is under half the claim
+(a hero-collage-style preview covering several pages at once is normal and
+shouldn't need a strict 1:1 match). Run it directly:
+
+```bash
+cd ~/Projects/talos-tools/digital-products
+python3 -c "
+import qa_gate
+from pathlib import Path
+ok, detail = qa_gate.check_preview_image_coverage(Path('product-item-N'))
+print(ok, detail)
+"
+```
+
+**This only checks the local build, not what's actually live on Etsy** — a
+product can pass this local check and still be under-illustrated on the
+platform if the publish step uploaded fewer images than were generated, or
+if Etsy silently dropped one. Before trusting a listing is fixed, verify the
+LIVE image count directly:
+
+```python
+import sys, json, os, requests
+sys.path.insert(0, "/Volumes/data/projects/listing-bot/src")
+from platforms.etsy_oauth import get_valid_access_token
+
+client_id = open("/Volumes/data/secrets/etsy-api-key").read().strip()
+client_secret = open("/Volumes/data/secrets/etsy-api-secret").read().strip()
+access_token = get_valid_access_token(client_id)
+headers = {"Authorization": f"Bearer {access_token}", "x-api-key": f"{client_id}:{client_secret}"}
+
+r = requests.get(f"https://openapi.etsy.com/v3/application/listings/{listing_id}/images", headers=headers)
+print(r.json()["count"])  # compare against the claimed page/design count
+```
+
+**Fixing the gap is production work** (render the missing preview images —
+PDF page renders via `pdftoppm`/PIL per the `visual-qa` skill, never
+PyMuPDF), not a checklist step — this section only covers *detecting* it
+mechanically, at both the local-build and live-listing layers, so it can't
+silently reach a buyer again. If you're rebuilding preview images for a
+product, load the `digital-product-quality-bar` skill's Step 0 first and
+pull 2-3 real competitor preview images to match against — the fix for "not
+enough images" and the fix for "images that don't compete visually" are the
+same production step; do them together, not as two separate passes.
