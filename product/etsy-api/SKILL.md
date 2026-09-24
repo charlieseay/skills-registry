@@ -1,6 +1,6 @@
 ---
 name: "etsy-api"
-description: "Query or manage the Seaynic Labs Etsy shop via the Etsy Open API v3 — list active/inactive listings, check for duplicate or existing listings before publishing anything new, look up a single listing, or deactivate/update one. Use this whenever a task involves Etsy listings, Etsy publishing, Etsy pricing, checking what's live on Etsy, or before any code/agent creates a new Etsy listing. Also use it to investigate Etsy OAuth/token errors, 403s mentioning \"shared secret\", or listing-fee cost questions. Do not hand-roll Etsy OAuth or guess at API headers — this skill has the exact working pattern and known gotchas."
+description: "Query or manage the Seaynic Labs Etsy shop via the Etsy Open API v3 — list active/inactive listings, check for duplicate or existing listings before publishing anything new, look up a single listing, or deactivate/update one. ALSO covers searching ALL of Etsy (competitor research) via the public findAllListingsActive endpoint — free, no third-party scraper needed, works even when Apify is capped. Use this whenever a task involves Etsy listings, Etsy publishing, Etsy pricing, checking what's live on Etsy, competitor/market research on Etsy, or before any code/agent creates a new Etsy listing. Also use it to investigate Etsy OAuth/token errors, 403s mentioning \"shared secret\", or listing-fee cost questions. Do not hand-roll Etsy OAuth or guess at API headers, and do not reach for Apify/a third-party scraper for Etsy search — this skill has the exact working pattern and known gotchas for both our own shop management and public competitor search."
 category: "product"
 metadata:
   version: "1.1.0"
@@ -372,3 +372,53 @@ immediate GET that may spuriously 404.
 
 This one check is what was missing on 2026-09-21 and is the entire reason
 this skill exists.
+
+## Searching all of Etsy (competitor research) — no third-party scraper needed
+
+**Confirmed working live 2026-09-24, exactly when it mattered: our Apify
+account was capped at its $29 spend limit for the next 13 days, and the
+first instinct was to look for a replacement scraper (Browse AI, Omkar
+Cloud, another Apify actor). All three turned out to be real but limited
+(50-100 free requests/month) and unnecessary** — the official Etsy Open
+API v3 already has a public, free, no-cap search endpoint that does the
+same job Apify was doing for market research (finding top competitor
+listings by keyword, reading their price/favorites):
+
+```python
+r = requests.get(
+    "https://openapi.etsy.com/v3/application/listings/active",
+    headers=headers,  # same x-api-key + Authorization header as everywhere else in this skill
+    params={"keywords": "monthly budget planner printable", "limit": 25, "sort_on": "score"},
+)
+d = r.json()
+# d["count"] = total matching listings across ALL of Etsy
+# d["results"] = list of listing objects: listing_id, title, price, num_favorers, shop_id, ...
+```
+
+This is `GET /v3/application/listings/active` (operation `findAllListingsActive`
+in Etsy's docs) — it is genuinely public, searches every active listing on
+Etsy by keyword (not just our shop), and uses the exact same auth headers
+already documented above. **10,000 requests/day, 5 QPS, completely free,
+zero relationship to any Apify billing cycle.**
+
+**One real gap, and the workaround:** review counts are a SHOP-level
+stat, not per-listing — `num_favorers` comes back on the listing object
+directly, but reviews require a second call:
+```python
+shop_id = listing_result["shop_id"]
+reviews = requests.get(f"https://openapi.etsy.com/v3/application/shops/{shop_id}/reviews", headers=headers, params={"limit": 1})
+review_count = reviews.json()["count"]
+```
+This matches exactly what tonight's Apify-based comp research was already
+capturing ("Shop Reviews" column) — this endpoint replaces that need
+one-for-one, no scraper required.
+
+**Preview images for a competitor listing** (useful for the
+`digital-product-quality-bar` skill's visual-comp Step 0, not just numeric
+comps): `GET /v3/application/listings/{listing_id}/images` — same pattern
+already documented elsewhere in this skill for our own listings, works
+identically on any listing_id, ours or a competitor's.
+
+**Default to this endpoint for any future Etsy market-research need before
+reaching for Apify or a third-party scraper** — it needs no new signup, no
+new credentials, and no separate spend cap to track.
