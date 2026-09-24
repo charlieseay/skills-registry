@@ -1,0 +1,168 @@
+/*
+Shared visual design system for planner/tracker/journal PDF products.
+Built 2026-09-24 from direct visual comparison against real top-selling
+Etsy comps (Monthly Budget Planner listing 4387150892, Bill Tracker
+listing 1296429625) after the first 40-product batch shipped visually
+bland (plain black-on-white, no color, no typographic hierarchy) despite
+being functionally correct (real AcroForm fields).
+
+Real comps consistently use: a bold chunky display font for titles, soft
+pastel accent colors per section/column (not gray), generous whitespace
+and wider row height than a cramped spreadsheet, rounded-corner table
+cells, and a colored circular/pill badge for callouts. This file
+encodes those patterns as reusable CSS custom properties + component
+classes so every product pulls from the same system rather than each
+render_layout.py inventing its own ad-hoc styling.
+*/
+
+:root {
+  --color-ink: #3a3a3a;
+  --color-ink-soft: #6b6b6b;
+  --color-bg: #ffffff;
+
+  /* Pastel accent palette - rotate through these per section/column,
+     matching the real comps' per-category color-coding pattern. */
+  --accent-pink: #fbd5e0;
+  --accent-pink-text: #9c3d5c;
+  --accent-blue: #cfeaf0;
+  --accent-blue-text: #2a6b7a;
+  --accent-yellow: #fbeec1;
+  --accent-yellow-text: #8a6d1f;
+  --accent-purple: #ded1f0;
+  --accent-purple-text: #5c4a8a;
+  --accent-green: #d9f0d9;
+  --accent-green-text: #3d7a3d;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 999px;
+
+  --font-display: "Poppins", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  margin: 0;
+  background: var(--color-bg);
+}
+
+/* Page title block - bold chunky display font, matches every comp's header */
+h1, .doc-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-size: 22px;
+  color: var(--color-ink);
+  margin: 0 0 2px 0;
+}
+
+h2 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  margin: 0 0 8px 0;
+}
+
+.subtitle, .doc-subtitle {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--color-ink-soft);
+  margin: 0 0 10px 0;
+}
+
+/* Section headers get a colored underline bar, not just bold black text */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-ink);
+  margin: 10px 0 5px 0;
+  padding-bottom: 3px;
+  border-bottom: 3px solid var(--accent-pink);
+}
+.section-title.blue { border-bottom-color: var(--accent-blue); }
+.section-title.yellow { border-bottom-color: var(--accent-yellow); }
+.section-title.purple { border-bottom-color: var(--accent-purple); }
+.section-title.green { border-bottom-color: var(--accent-green); }
+
+/* Tables - colored pastel header row instead of flat gray, rounded cells,
+   generous row height (comps are NOT cramped spreadsheets) */
+table.tracker-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 10px;
+}
+table.tracker-table th {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 7px 8px;
+  text-align: left;
+  background: var(--accent-pink);
+  color: var(--accent-pink-text);
+  border: 1px solid #fff;
+}
+table.tracker-table th:nth-child(4n+2) { background: var(--accent-blue); color: var(--accent-blue-text); }
+table.tracker-table th:nth-child(4n+3) { background: var(--accent-yellow); color: var(--accent-yellow-text); }
+table.tracker-table th:nth-child(4n+4) { background: var(--accent-purple); color: var(--accent-purple-text); }
+
+table.tracker-table td {
+  padding: 4px 8px;
+  font-size: 10.5px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+}
+table.tracker-table tr:nth-child(even) td { background: #fafafa; }
+table.tracker-table tr.totals-row td {
+  font-weight: 700;
+  background: #f3f3f3;
+}
+
+/* Fillable field underline - slightly thicker, colored, more visible
+   than a thin gray line (matches comps' clear affordance for "write here") */
+.amt-field, .name-line, .month-line {
+  border: none;
+  border-bottom: 1.5px solid var(--color-ink-soft);
+  display: inline-block;
+  width: 100%;
+  height: 16px;
+}
+
+/* Rounded checkbox styled to match comps' rounded-square check cells */
+.check-box {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--color-ink-soft);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* Callout pill badge - "INSTANT DOWNLOAD" / "EDITABLE PDF" style circular
+   callouts seen on every comp image */
+.badge-pill {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--color-ink-soft);
+  color: var(--color-ink-soft);
+}
+
+.notes-box {
+  border: 1.5px solid #e5e5e5;
+  border-radius: var(--radius-sm);
+  min-height: 42px;
+  width: 100%;
+}

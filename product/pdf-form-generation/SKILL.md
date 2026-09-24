@@ -113,6 +113,43 @@ AcroForm structure exists, not that it renders/behaves correctly in a real
 viewer (appearance streams, `/NeedAppearances`, etc. are easy to get subtly
 wrong in ways a structural check won't catch).
 
+## Visual design — this is not optional, it is Step 0 of digital-product-quality-bar
+
+**Confirmed 2026-09-24: a batch of 40 products shipped functionally correct
+(real fields, real content, no repetition) but visually bland — plain
+black-on-white, no color, no typographic hierarchy — because market-evidence
+research (review counts, pricing) was done but the VISUAL half of
+`digital-product-quality-bar`'s Step 0 competitor research was skipped.**
+Charlie caught this by eye immediately on review. Do not repeat this: before
+writing any `render_layout.py`, pull 2-3 real preview images from the
+strongest comp listing(s) for that product's category via the Etsy API
+(`GET /v3/application/listings/{id}/images`) and actually look at them
+(download + Read as an image) — not just their review/favorite counts.
+
+A shared, evidence-based CSS design system now exists at
+`design-system/style.css` in this skill directory, built directly from real
+comp images (Monthly Budget Planner and Bill Tracker top listings). It
+provides: `.doc-title`/`h1` (bold display font), `.section-title` (colored
+underline bar), `table.tracker-table` (pastel color-coded header row that
+rotates pink/blue/yellow/purple per column, zebra-striped rows), `.amt-field`/
+`.name-line` (visible field underlines), `.check-box` / a page-local
+`.checkbox-box` alias (rounded checkbox), `.notes-box`, `.badge-pill`. Load
+it into any product's `STYLE` block with:
+
+```python
+DESIGN_SYSTEM_CSS = Path("/Volumes/data/skills/product/pdf-form-generation/design-system/style.css").read_text()
+STYLE = f"<style>{DESIGN_SYSTEM_CSS}\n  /* page-specific overrides below */\n</style>"
+```
+
+**Known gotcha, hit twice already (products #175 and #209): any `<table>`
+tag must carry `class="tracker-table"` or the shared styles never match —
+bare `<table>`/`<th>`/`<td>` renders with zero styling. Same for `.amt-field`/
+`.qty-field`-style inline spans: they need an explicit `width` or they
+collapse to invisible with no field line at all, even though the border-bottom
+rule is present in CSS.** Always visually render and Read at least one full
+page after wiring in the design system — do not assume the CSS applied just
+because the script ran without error.
+
 ## Scaling to a real product batch
 
 `scripts/add_form_fields.py` is now generalized (as of 2026-09-24, first
