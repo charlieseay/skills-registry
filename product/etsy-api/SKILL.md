@@ -116,14 +116,57 @@ Base URL: `https://openapi.etsy.com/v3/application`
 | Purpose | Method + path |
 |---|---|
 | List listings (any state) | `GET /shops/{shop_id}/listings?state=active\|inactive\|draft&limit=100&offset=N` |
-| Get one listing | `GET /shops/{shop_id}/listings/{listing_id}` |
+| Get one listing | `GET /listings/{listing_id}` — **listing-scoped, no shop_id.** The shop-scoped `GET /shops/{shop_id}/listings/{listing_id}` 404s for a draft listing that demonstrably still exists in the shop's own listing search (confirmed 2026-09-23) — use the listing-scoped path for a definitive single-listing check. |
 | Update title/description/tags/state | `PATCH /shops/{shop_id}/listings/{listing_id}` |
 | Update price/quantity | `PUT /listings/{listing_id}/inventory` — see below, NOT the plain PATCH |
 | Create a new listing | `POST /shops/{shop_id}/listings` |
+| Delete a listing | `DELETE /listings/{listing_id}` — **listing-scoped, no shop_id.** `DELETE /shops/{shop_id}/listings/{listing_id}` 404s (same shop-vs-listing-scoped trap as GET above), confirmed 2026-09-23 deleting 6 dead duplicate drafts. |
 
 `state=active` is the one that matters for duplicate-checking and for "what's
 actually live" questions — `inactive`/`draft` listings aren't costing listing
 fees and aren't visible to buyers.
+
+**The shop-scoped listing list (`GET /shops/{shop_id}/listings?state=...`) is
+eventually consistent and can lag well behind reality** — confirmed
+2026-09-23: 6 listings individually DELETEd (each got a clean `204`) still
+appeared in a `state=draft` list query moments later, while an individual
+`GET /listings/{id}` on each correctly returned `404`. When you need a
+definitive single-listing answer (did my write actually take?), always
+GET that one listing_id directly — never trust the list endpoint's absence
+or presence of an entry as proof, in either direction.
+
+## Digital file size limit — 20MB per file, 5 files per listing
+
+Etsy's `POST /shops/{shop_id}/listings/{listing_id}/files` returns
+`400 {"error": "This file exceeds the maximum file size"}` for any single
+file over roughly 20MB, with zero indication of the actual limit or that
+splitting is the fix. Confirmed 2026-09-23 after this exact error produced
+**6 dead duplicate draft listings** across two products (a brief-compiler
+bug repeatedly retried the same oversized upload, see
+`talos-product-launch-audit`) — Etsy's own docs confirm: 20MB max per
+file, up to 5 files per listing, 100MB total.
+
+A single zip bundling both print-PDF and digital-PNG exports for a
+multi-page product (a coloring book, a gamebook with many illustrated
+pages) routinely exceeds this once a product has more than ~4-5 pages at
+real print/tablet resolution — don't assume a "reasonable" zip is safe;
+check its size before upload.
+
+**The fix, already implemented in `listing-bot/src/platforms/etsy.py`
+(`_split_zip_under_limit` / `_upload_digital_deliverable`, added
+2026-09-23):** if the deliverable zip exceeds ~19MB (1MB margin under
+Etsy's cap), repack its contents into multiple sub-19MB zips via
+largest-first bin packing, and upload each as a separate digital file
+(Etsy's 5-file-per-listing allowance covers this for any product this
+pipeline currently produces). `publish()`'s call site already uses this;
+`update_digital_file()` (the *replace an existing listing's file* path,
+not initial publish) does **not** yet — it will hit the same 400 if ever
+asked to replace a file over the limit. Extend the same split logic there
+if that path is needed for an oversized replacement.
+
+If you hit "exceeds the maximum file size" anywhere else in this codebase
+(or a different publisher entirely), this is the fix pattern — don't
+re-diagnose from scratch.
 
 ## Price format
 

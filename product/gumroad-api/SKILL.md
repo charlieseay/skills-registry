@@ -157,6 +157,23 @@ fallback. Deletion and unpublishing are not equivalent — deletion may be
 recoverable through Gumroad support but is not something Gumroad's API lets
 you casually reverse yourself.
 
+**CONFIRMED AT SCALE, 2026-09-24: this is not an occasional race condition —
+`PUT published=false` failed on 21/21 real products, zero exceptions**, when
+Charlie authorized a full catalog purge (pivoting to Etsy-only distribution
+for now). Every one of the 21 calls returned `success: true`; a fresh re-fetch
+(both individual `GET /v2/products/{id}` and the full `GET /v2/products`
+listing) showed every single one still `published: true` afterward. This
+looks like the endpoint is currently non-functional for this account, not
+flaky. Given explicit authorization and zero sales confirmed on all 21
+(checked before deleting any — see "Checking for sales before a destructive
+action" below if that section doesn't exist yet, add it), `DELETE` was used
+instead and worked cleanly on all 21, verified the same way (individual
+re-fetch showed `deleted: true, published: false`; the full listing endpoint
+returned 0 products afterward). If unpublish is needed again, expect it to
+still be broken — verify with a re-fetch before assuming it worked, and if it
+has, DELETE remains the fallback (with the same sales-check-first, explicit
+authorization discipline) rather than something reserved for luck.
+
 If you hit this no-op again, the correct move is: report the exact request
 you sent, the response you got, and the re-fetch showing it didn't apply —
 then stop and let a human decide whether deletion is acceptable for that

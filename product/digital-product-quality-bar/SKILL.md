@@ -36,6 +36,44 @@ enforceable gate so it doesn't stay a one-time realization.
 
 ## The gate — run before any product goes live
 
+### 0. Pull real competitor comps first — every category, not just Notion
+
+The Notion comparison in "Why this exists" wasn't a one-time realization —
+it's the method. Before judging a product against this skill's checklist,
+pull 3-5 real, currently-live listings in the exact same search space and
+compare structured attributes directly. Skipping this step and going
+straight to the checklist below risks passing a product that clears every
+box here while still being structurally uncompetitive, because the boxes
+were written from a fixed snapshot of the market, not the category this
+specific product is entering.
+
+**How to pull comps (mechanical, not subjective):**
+
+1. Search the primary keyword phrase on Etsy (or Gumroad, if that's the
+   product's real competitive set) the way a buyer would — not a title
+   fragment, the actual phrase from the listing's Title field.
+2. Take the top 3-5 non-ad results with real review/favorite counts (skip
+   anything with 0 reviews and 0 favorites — that's not a proven comp,
+   it's another struggling listing like the one you're checking).
+3. Record, per comp: preview image count, price, deliverable format
+   (ready-to-use vs. build-spec vs. bundle), review count, and one
+   sentence on what the listing photos/copy emphasize that ours doesn't.
+4. Compare against the product under review using that table, not memory
+   or a general sense of "the market." A gap of 1 image vs. 10, or
+   $40 vs. $2.99, is not a pricing problem to fix with SEO — it's the
+   signal that something in sections 1-4 below needs to change first.
+
+**This step has no per-category checklist yet for anything outside
+Notion/Canva** (coloring books, gamebooks, font bundles, etc. only have
+the thin category-specific bullets in section 4) — if you run this
+comparison for one of those categories and find a structural gap the way
+the original Notion comparison did, add a category table here the same
+way, rather than treating the finding as a one-off for that single
+product. The gap in this skill right now is real: it has a philosophy
+("compare against comps") but only one worked example (Notion). Building
+out concrete comp tables per category as they get audited is exactly how
+this section should grow.
+
 ### 1. Deliverable format (the single biggest lever)
 
 **Ready-to-use is the market baseline for Notion and Canva products as of
@@ -118,6 +156,27 @@ printable vs. digital-only (iPad/GoodNotes) vs. both.
 
 **Coloring books**: at least one preview image shows an actual finished
 sample page — buyers won't buy blind on art quality.
+
+First real comp table for this category (pulled 2026-09-23, "engineering
+coloring page adult" search, Etsy Open API, top proven results filtered
+to nonzero reviews/favorites):
+
+| | Our product-176 | Comp: "Engineering Coloring Pages for Kids & Adults" | Comp: "Engineering Coloring Book for Adults" |
+|---|---|---|---|
+| Preview images | 4 | 7 | 4 |
+| Price | $4.99 | $55.00 | $1.99 |
+| Favorites | 0 (new) | 4 | 4 |
+| Pages | 6 | unconfirmed | unconfirmed |
+
+Takeaway: our image count (4) sits between the two comps, not a
+structural gap the way the Notion case was — the $55 outlier is priced
+for a bundle/poster-set positioning, not a like-for-like comp on page
+count. The real lever for this category based on this pull is favorites
+count at zero (expected for a same-day listing, re-check after it's had
+time to accumulate) rather than a deliverable-format or image-count gap.
+This is the category's first real data point, not a final verdict — run
+this search again and update the table once there's real sales/view data
+on our own listing to compare against.
 
 **Font bundles**: preview shows a full alphabet specimen (upper, lower,
 numerals, punctuation) plus 2-3 realistic use-case mockups · license terms

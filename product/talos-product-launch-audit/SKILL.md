@@ -71,6 +71,22 @@ is usually the fastest, highest-value first pass: duplicates cost real
 listing fees on Etsy and confuse buyers on both platforms, and they are
 mechanically checkable with zero ambiguity.
 
+**If you delete a platform's dead/broken listing and want to re-publish,
+you must also clear that platform's entry from STATUS.json first** —
+confirmed 2026-09-23. `listing-bot/src/workers/publish_product.py` checks
+`STATUS.json`'s cached `platforms.<name>` entry before attempting a
+publish, and if one exists it prints `"Skipping already-published
+platform(s): <name>"` and does nothing — it never re-checks whether that
+cached listing_id is still real. This produced a genuinely dangerous false
+signal: after deleting a broken Etsy draft (zero files attached, product
+177) and re-running the publisher, it reported `success: true` with the
+OLD, now-deleted listing_id, because it silently skipped the actual
+upload and just echoed the stale STATUS.json URL back. The fix is simple
+but easy to miss: `del STATUS.json["platforms"]["etsy"]` (or whichever
+platform) and null out the top-level `<platform>_listing_url` field before
+re-running the publisher, so it treats the product as genuinely
+unpublished on that platform.
+
 ### Phase 2 — Truth-in-listing sweep (highest severity, do this before pricing/imagery)
 
 For every live listing, cross-reference the promise in the title/description
