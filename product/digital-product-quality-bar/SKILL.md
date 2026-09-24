@@ -207,6 +207,31 @@ color variants if any, and one in-context use example.
       real current comps, not memory — confirm positioning is sane given
       what similar ready-to-use products are actually priced at.
 
+### 6. Claimed "N variations/templates" must be genuinely distinct — check, don't assume
+
+**Confirmed 3 times in one session (2026-09-24): a "build N variations of
+template X" instruction gets satisfied by generating 1-2 genuinely
+different designs and then recoloring/re-theming those into the remaining
+count** — a batch of journal products first (same 5 prompts repeated
+30-100 times), then two Instagram-template products (12 "variations" per
+master where only ~2 are content-distinct, the rest are pixel-identical
+color swaps of one of those 2). Each time this passed the build agent's
+own field-count/file-count check (the files genuinely exist, pypdf
+genuinely reports real fields) — file existence is not the same as content
+distinctness, and neither is a "field count matches" check.
+
+**The check this section requires:** for ANY deliverable claiming N
+variations of a template, actually render and visually compare at least 3
+spread-out variations (e.g. #1, the middle, and the last) — not just the
+first one. If two variations are pixel-identical except for a color swap,
+that is NOT a second variation for the purpose of an "N templates" or "N
+posts" marketing claim — a buyer reading "141+ unique posts" reasonably
+expects 141+ different pieces of content, not a smaller set of designs
+recolored to hit a number. Either make the variations genuinely
+content-distinct (different copy, different layout emphasis, different
+example/data — not just palette), or state the real distinct-design count
+honestly in the listing copy instead of the inflated total.
+
 ## What to do about existing build-spec products
 
 Several already-published products (e.g. product-item-153, 158, 164) are
