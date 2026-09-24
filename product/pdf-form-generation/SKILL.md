@@ -150,6 +150,71 @@ rule is present in CSS.** Always visually render and Read at least one full
 page after wiring in the design system — do not assume the CSS applied just
 because the script ran without error.
 
+## The most expensive recurring bug: never-shipped restyles
+
+**Confirmed 3+ times on 2026-09-24 across ~20 products in one batch:** a
+render/restyle pass genuinely regenerates correct new content in an
+intermediate directory (commonly named `render-v2`), but the final
+`add_form_fields.py` overlay step never runs against the shipped
+`phase-3/customer-package/<name>.pdf` path — so the customer-facing file
+silently stays on the OLD version while a commit message and a detailed
+agent report both claim the fix is complete. This is not a hypothetical —
+it happened to products #171-190, #207 twice, and nearly shipped a wrong
+duplicate on #199.
+
+**The fix, every time, in one command:**
+```bash
+python3 /Volumes/data/skills/product/pdf-form-generation/scripts/add_form_fields.py <intermediate_dir> phase-3/customer-package/<name>.pdf
+```
+Run this as the LAST step of any render/restyle work, against the actual
+final `render_layout.py` output directory — never consider a visual change
+"shipped" just because `render_layout.py` ran without error.
+
+**Verifying a claimed fix is real, not just a plausible report:**
+1. `git log --oneline -- <exact shipped file path>` — if the fix commit
+   doesn't appear, the shipped file was never touched, no matter what the
+   commit message or agent report says.
+2. `pypdf.get_fields()` field count AND page count against a known-good
+   baseline (STATUS.json's prior numbers, or an independent earlier check).
+3. Actually render 2-3 spread-out pages to PNG at 100+ DPI and Read them —
+   a screenshot rendered too small/low-DPI can look unstyled even when the
+   CSS is genuinely correct (verified 2026-09-24 on product #184: a
+   misleadingly low-DPI screenshot looked completely unstyled; a fresh
+   150dpi render of the identical file showed the styling was fine all
+   along — re-render before concluding a restyle failed).
+4. If still unsure, query computed styles directly instead of guessing from
+   pixels: `page.eval_on_selector("h1", "el => getComputedStyle(el).fontWeight")`
+   during the Playwright render step settles it immediately.
+
+## Second recurring bug: `pdf-form-fields.json` path portability
+
+`render_layout.py` writes each page's `pdf_path` — if written as
+`str(pdf_path)` from a relative `out_dir` argument, the resulting path is
+relative to whatever directory the script was RUN from, not to the
+`pdf-form-fields.json` file itself. Running `add_form_fields.py` from a
+different working directory later (e.g. a fresh agent session, or after
+`cd`-ing elsewhere) then fails with `FileNotFoundError` on a path like
+`product-item-184-gratitude-journal/phase-1/01-day-1.pdf` that doesn't exist
+relative to the new cwd. **Always write `pdf_path` as just the basename**
+(`pdf_path.name`, not `str(pdf_path)` or `str(pdf_path.absolute())`) so the
+JSON stays portable — `add_form_fields.py` already resolves it relative to
+the JSON's own directory. The current `scripts/render_layout.py` demo and
+`product-item-175-budget-planner`'s copy do this correctly; if you copy an
+older product's script as your starting point, check this specifically.
+
+## Third recurring bug: class-name mismatches silently no-op the CSS
+
+A page-specific style block can define a rule (e.g. `.theme { background:
+var(--accent-pink); ... }`) while the actual HTML element uses a
+differently-named class (`class="week-theme"`) — no error, no warning, the
+CSS rule simply never matches and that element renders with zero styling
+while everything else on the page looks fine. This happened on product #184
+after an otherwise-correct restyle. **After wiring in any new page-specific
+CSS class, grep the same file for both the CSS selector and every markup
+usage and confirm they're identical strings** — don't rely on the visual
+render alone to catch this, since a missing color/badge on one element
+among many is easy to miss at a glance.
+
 ## Scaling to a real product batch
 
 `scripts/add_form_fields.py` is now generalized (as of 2026-09-24, first

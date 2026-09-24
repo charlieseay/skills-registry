@@ -55,9 +55,19 @@ specific product is entering.
 2. Take the top 3-5 non-ad results with real review/favorite counts (skip
    anything with 0 reviews and 0 favorites — that's not a proven comp,
    it's another struggling listing like the one you're checking).
-3. Record, per comp: preview image count, price, deliverable format
-   (ready-to-use vs. build-spec vs. bundle), review count, and one
-   sentence on what the listing photos/copy emphasize that ours doesn't.
+3. **Fetch and actually look at 2-3 of the comp's real preview images**
+   (`GET /v3/application/listings/{id}/images` on Etsy, download the URLs,
+   Read them as images) — do not stop at recording the image count as a
+   number. Confirmed 2026-09-24: a full batch of 40 products was built with
+   correct market-evidence numbers (reviews, favorites, pricing) but zero
+   competitor images actually viewed, and shipped visually bland (plain
+   black-on-white, no color, no typography) compared to what real winning
+   listings look like. The numeric comp table alone does not catch a visual
+   quality gap — only looking at the images does. Record, per comp: preview
+   image count, price, deliverable format (ready-to-use vs. build-spec vs.
+   bundle), review count, and one sentence on what the listing photos/copy
+   emphasize that ours doesn't (palette, typography, layout density,
+   mockup/prop styling, badge callouts).
 4. Compare against the product under review using that table, not memory
    or a general sense of "the market." A gap of 1 image vs. 10, or
    $40 vs. $2.99, is not a pricing problem to fix with SEO — it's the
