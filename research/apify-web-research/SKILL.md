@@ -69,6 +69,35 @@ This list can go stale — always confirm with a live `GET /v2/acts` call
 rather than trusting this table blindly if it's been a while since it was
 last updated (see date on this skill's last edit).
 
+## Cost-guard integration — before running any actor
+
+**MANDATORY:** Call the cost-guard pre-flight check BEFORE any actor run:
+
+```bash
+python3 /Users/charlieseay/Projects/claude-config/bin/apify-cost-guard.py --threshold=27.00
+if [ $? -ne 0 ]; then
+    echo "ERROR: Apify cost threshold exceeded, cannot run actor"
+    exit 1
+fi
+```
+
+Or in Python:
+
+```python
+import subprocess
+result = subprocess.run([
+    "python3",
+    "/Users/charlieseay/Projects/claude-config/bin/apify-cost-guard.py",
+    "--threshold=27.00"
+])
+if result.returncode != 0:
+    raise RuntimeError("Apify cost ceiling breached — blocking run")
+```
+
+Talos's `apify-scraper.js` already has this integration wired in (2026-09-24).
+
+---
+
 ## Running an actor and getting results — verified pattern
 
 Apify's actor-run flow is async: start a run, poll until it finishes (or
@@ -145,31 +174,51 @@ names vary by actor; always inspect a real item from the dataset before
 assuming a field exists, the same discipline `etsy-api` already teaches
 for that platform's own API responses.
 
-## Cost awareness — real ceiling, and a verified false-confidence trap
+## Cost awareness — automated enforcement in place (2026-09-24)
 
 Apify billing is metered per compute-unit and per-paid-actor-event, not a
-flat subscription. The account's plan is STARTER: `monthlyUsageCreditsUsd:
-29, maxMonthlyUsageUsd: 29` — a genuine hard $29/month credit pool, not
-just a policy number. This pipeline's own standing rule
-(`feedback_apify_cost_ceiling` in memory) self-enforces a lower **$27**
-warning line so there's margin before the real cap bites.
+flat subscription. The account's plan is STARTER: hard $29/month credit
+pool. An automated cost-enforcement script now blocks actor runs when
+spending approaches the cap.
 
-**Checking `GET /v2/users/me/usage/monthly`'s top-level
-`monthlyServiceUsage.ACTOR_COMPUTE_UNITS.amountAfterVolumeDiscountUsd`
-field alone is a trap — confirmed live 2026-09-23.** That field only
-covers compute-unit cost, one of several billed service types. The real
-total credits consumed for the cycle is
-`data.totalUsageCreditsUsdAfterVolumeDiscount` at the top level of the
-response, not nested under any one service. Checking only the
-`ACTOR_COMPUTE_UNITS` line showed `$0.07` — looking safe — while the real
-total was `$29.82`, already over the $29 cap, driven almost entirely by
-`PAID_ACTORS_PER_EVENT` charges (several of the actors on this account are
-paid, ~$5/day in the first half of this cycle). Acting on the
-compute-units-only figure led directly to an actual live 403
-`platform-feature-disabled: Monthly usage hard limit exceeded` on the very
-next run attempt.
+**STATUS: Automated enforcement active** (as of 2026-09-24)
 
-**Always read the top-level total, not a single service line:**
+The script `/Users/charlieseay/Projects/claude-config/bin/apify-cost-guard.py`
+runs as a pre-flight check before any actor invocation. It:
+
+1. Queries the real TOTAL spend (`totalUsageCreditsUsdAfterVolumeDiscount`),
+   not the per-service trap
+2. Blocks runs when spend >= $27 (safety ceiling with $2 margin)
+3. **Fails CLOSED** (blocks runs) if cost cannot be verified — a missing
+   token, empty token, or API error all block the run rather than allow
+   it. This is deliberate: the whole point of this script is spend safety,
+   so "can't confirm spend is safe" must mean "don't run," not "run
+   anyway and hope." (An earlier version of this script fail-opened on
+   error, which defeats the purpose of a spend cap — fixed 2026-09-24.)
+4. Identifies what's driving the spend (PAID_ACTORS_PER_EVENT vs compute units)
+
+Exit codes:
+- **0:** OK to run (spend confirmed < $27 threshold via live API)
+- **1:** BLOCKED — either spend >= $27 threshold, or cost could not be
+  verified (missing/empty token, API error). Both cases block.
+
+### The Trap (now fixed)
+
+Checking `GET /v2/users/me/usage/monthly`'s `ACTOR_COMPUTE_UNITS` field
+alone is a trap — confirmed live 2026-09-23. That field only covers
+compute-unit cost, one of several billed service types. The real
+total credits consumed for the cycle is `totalUsageCreditsUsdAfterVolumeDiscount`
+at the top level of the response, not nested under any one service.
+
+Example of the trap from actual account state on 2026-09-23:
+- `ACTOR_COMPUTE_UNITS` showed: $0.07 (looks safe)
+- `PAID_ACTORS_PER_EVENT` showed: $29.73 (hidden in per-service detail)
+- Real TOTAL: $29.82 (over the $29 hard limit)
+
+The account's paid actors (~$5/day per-event charges) completely dominate
+compute units, and would have remained invisible to a naive per-service check.
+
+### Manual cost check (if cost-guard is unavailable)
 
 ```python
 resp = requests.get(
@@ -177,17 +226,15 @@ resp = requests.get(
     headers=headers,
 )
 data = resp.json()["data"]
-spent_this_cycle = data["totalUsageCreditsUsdAfterVolumeDiscount"]  # NOT a nested per-service field
+spent_this_cycle = data["totalUsageCreditsUsdAfterVolumeDiscount"]  # top level, NOT nested
 cycle_end = data["usageCycle"]["endAt"]
-if spent_this_cycle > 20:  # well under the $27 self-enforced ceiling, leaves room to notice before it's tight
-    print(f"WARNING: ${spent_this_cycle:.2f} spent this cycle (resets {cycle_end}) -- do not run more actors")
+if spent_this_cycle >= 27.00:  # $27 safety ceiling, $29 hard limit
+    print(f"BLOCKED: ${spent_this_cycle:.2f} spent (resets {cycle_end})")
 ```
 
 If the account is at or past the cap, actor runs fail outright (403) —
-there is no graceful degradation. Check this BEFORE attempting a run, not
-after a failure, and if the cycle is exhausted, fall back to a plain web
-search or wait for the next cycle (`usageCycle.endAt`) rather than
-retrying against a hard limit.
+there is no graceful degradation. The cost-guard prevents this by checking
+BEFORE attempting a run.
 
 Set `maxItems` conservatively on every run (10-20 is usually plenty for a
 comp table of 3-5 real competitors) rather than pulling a full dataset —
