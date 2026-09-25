@@ -133,6 +133,14 @@ found repeatedly on 2026-09-21:
   destroys discoverability — check a sample of live tags across the
   catalog for this pattern, especially on any shop with real listings but
   zero/near-zero views.
+- **Leaked internal ID prefixes in titles** (found 2026-09-25): titles
+  like "Product #54: Soccer Social Media Templates Bundle", "Digital Product:
+  All Fonts Pack", or "Product #item-157: Meditation Journal". This happens
+  when agents or brief generators echo internal task titles into customer
+  listing copy. `validators.py` and `qa_gate.py`'s `listing_titles_and_copy_clean`
+  gate now strictly forbid all internal sequence numbers (`Product #N`,
+  `Digital Product:`, `Strategy Item #N`, `product-item-N`) in titles and copy.
+  Always ensure titles lead with customer-first benefits without internal tags.
 - **Leaked internal IDs rendered INTO images, not just text** (found
   2026-09-22, 3 independent occurrences: product-item-22, 153, 164): the
   phrase "Strategy item #N" (or "Strategy Item #N") can get burned
@@ -159,9 +167,9 @@ found repeatedly on 2026-09-21:
   content-validator run means the images are clean too.
 
 Any confirmed hit in this phase (undisclosed spec-as-product, content
-mismatch, corruption, or leaked scratchpad text) gets pulled from sale
-immediately (both platforms), before moving to Phase 3. See "Pulling a
-listing" below for the exact mechanics and the standing authorization
+mismatch, corruption, leaked scratchpad text, or leaked internal ID prefix)
+gets pulled from sale immediately (both platforms), before moving to Phase 3.
+See "Pulling a listing" below for the exact mechanics and the standing authorization
 boundaries. A disclosed build-spec or a leaked-tags problem does not need
 pulling — fix in place (rewrite tags, no listing downtime required).
 

@@ -47,17 +47,14 @@ The validator lives in `listing-bot`'s own codebase:
 
 Read it. As of 2026-09-21 it has (at minimum) two pattern families:
 
-- `PLACEHOLDER_TITLE_PATTERNS` — matches when the **entire title** is just
-  `Product #N` or `Strategy Item #N` (anchored with `^...$`).
-- `INTERNAL_NUMBERING_IN_BODY` — matches `Product #N` / `Strategy Item #N`
-  (and lowercase variants) appearing **mid-text** anywhere in the
+- `PLACEHOLDER_TITLE_PATTERNS` — matches when the title is just
+  `Product #N` or `Strategy Item #N`, OR when the title starts with an internal
+  pipeline prefix (e.g. `Product #54: ...`, `Digital Product: ...`, `Product #item-157: ...`).
+- `INTERNAL_NUMBERING_IN_BODY` — matches `Product #N`, `Product #item-N`,
+  `Strategy Item #N` (and lowercase variants) appearing anywhere in the
   description.
-
-Check the file for any additional pattern families before assuming the list
-above is complete — this file gets extended over time and this skill's
-summary can go stale exactly the way STATUS.json's cached error did. Also
-check for a phase-path leak check (matching literal `phase-0`, `phase-1`,
-etc. in body text) — this is what actually blocked product-item-142.
+- `INTERNAL_CONTENT_PATTERNS` — catches `AGY`, `per AGY`, `phase-0` through `phase-4`,
+  `execution-plan`, `STATUS.json`, etc.
 
 ## Step 2 — run the real function against the current file, don't pattern-match by eye
 

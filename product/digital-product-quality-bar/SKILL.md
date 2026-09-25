@@ -232,6 +232,13 @@ content-distinct (different copy, different layout emphasis, different
 example/data — not just palette), or state the real distinct-design count
 honestly in the listing copy instead of the inflated total.
 
+### 7. Zero Leaked Internal Identifiers in Customer-Facing Content (HARD BLOCKER)
+
+- [ ] **No Internal Product Numbers in Titles or Copy**: The product title, listing description, cover images, and delivered customer READMEs must NEVER contain internal pipeline identifiers such as `Product #54:`, `Digital Product:`, `Product #item-157:`, or `Strategy Item #N`.
+- [ ] **Customer-First Naming**: Product titles must lead directly with the customer-facing benefit and name (e.g., *"Soccer Social Media Templates Bundle"*, *"Watercolor Meditative Coloring Book"*, *"2026 Notion Life Planner"*).
+- [ ] **Directory Structure Standard**: Every product directory on disk must use descriptive kebab-case slugs: `product-item-<num>-<descriptive-slug>`. Avoid bare numerical directory names to prevent ID collisions and missing-name fallbacks.
+- [ ] **QA Gate Enforcement**: `qa_gate.py`'s `no_internal_identifiers_in_customer_files` gate runs OCR scans across preview images and regex scans across all customer packages; any match on internal IDs causes an immediate hard FAIL.
+
 ## What to do about existing build-spec products
 
 Several already-published products (e.g. product-item-153, 158, 164) are
