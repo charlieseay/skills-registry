@@ -5,7 +5,7 @@ category: "product"
 metadata:
   version: "1.0.0"
   agents: ["any"]
-  related_skills: ["talos-product-launch-audit", "product-quality-verify", "etsy-gumroad-reprice-seo", "etsy-api"]
+  related_skills: ["talos-product-launch-audit", "product-quality-verify", "etsy-gumroad-reprice-seo", "etsy-api", "etsy-catalog-triage"]
 ---
 
 # Digital Product Quality Bar
@@ -83,6 +83,32 @@ product. The gap in this skill right now is real: it has a philosophy
 ("compare against comps") but only one worked example (Notion). Building
 out concrete comp tables per category as they get audited is exactly how
 this section should grow.
+
+**Route the comp-pull through the `research` role, not raw agent compute.**
+The actual data still comes from `etsy-api`'s public search endpoint (step
+1-3 above) — that part never changes. What routes is the *analysis*: once
+you have 3-5 comps' raw data, summarizing what they emphasize and where
+gaps exist is read-heavy, low-tool-loop work, exactly what
+`agent_routing.py`'s `research` role exists for (free-tier OpenRouter/
+Ollama first, AGY as fallback, Claude Max last — per `subscriptions-first`,
+never spend paid tokens on this if a free lane can do it):
+
+```python
+import sys
+sys.path.insert(0, "/Volumes/data/Projects/claude-config/bin/lib")
+from agent_routing import execute_for_role
+
+comp_summary = execute_for_role(
+    "research",
+    prompt=f"Compare our listing against these {len(comps)} competitor "
+           f"comps and identify concrete gaps (images, price, deliverable "
+           f"format, copy emphasis): {comps_json}",
+)
+```
+
+This keeps the comp-check cheap and routine enough to run on every product,
+not just when someone remembers to do it by hand — which is the actual
+gap this section flags in its own last paragraph above.
 
 ### 1. Deliverable format (the single biggest lever)
 
@@ -235,6 +261,8 @@ honestly in the listing copy instead of the inflated total.
 ### 7. Zero Leaked Internal Identifiers in Customer-Facing Content (HARD BLOCKER)
 
 - [ ] **No Internal Product Numbers in Titles or Copy**: The product title, listing description, cover images, and delivered customer READMEs must NEVER contain internal pipeline identifiers such as `Product #54:`, `Digital Product:`, `Product #item-157:`, or `Strategy Item #N`.
+- [ ] **No Leaked Working-File Headings**: A `phase-3/*listing*.md` file's own H1 (e.g. `# Etsy Listing Copy — Monthly Budget Planner (Fillable PDF)`) is a filename-for-the-file-itself, not the product name — found live on Etsy 2026-09-26 on 6 listings (`publish_product.py`'s title extraction took the H1 verbatim, and this exact phrase wasn't in either the extraction sanitizer or `validators.py`'s pre-publish check — both are fixed now, see `watch_approvals`/`listing-bot` git history same date). If you ever hand-author or hand-edit one of these files, don't assume the H1 is safe to reuse as the title without checking it reads as a real product name first.
+- [ ] **No Marketing-Filler Words as Tags**: Etsy tags generated from description text must be real buyer search terms, not incidental words like `perfect`, `stop`, `wondering`, `comprehensive`, `control` that happen to appear in the marketing copy — found live 2026-09-26 on 4 listings (`seo/keywords.py`'s stop-word list only filtered grammatical filler, not marketing-copy filler; fixed same date).
 - [ ] **Customer-First Naming**: Product titles must lead directly with the customer-facing benefit and name (e.g., *"Soccer Social Media Templates Bundle"*, *"Watercolor Meditative Coloring Book"*, *"2026 Notion Life Planner"*).
 - [ ] **Directory Structure Standard**: Every product directory on disk must use descriptive kebab-case slugs: `product-item-<num>-<descriptive-slug>`. Avoid bare numerical directory names to prevent ID collisions and missing-name fallbacks.
 - [ ] **QA Gate Enforcement**: `qa_gate.py`'s `no_internal_identifiers_in_customer_files` gate runs OCR scans across preview images and regex scans across all customer packages; any match on internal IDs causes an immediate hard FAIL.
@@ -351,4 +379,9 @@ thumbnail alone:**
    views and zero conversions is telling you something specific is wrong
    (usually images or deliverable format); a listing with zero views has
    a discovery problem this skill doesn't address (see
-   `etsy-gumroad-reprice-seo` for that half of the problem).
+   `etsy-gumroad-reprice-seo` for that half of the problem). If the catalog
+   has many listings and you need to pick which 1-3 deserve today's effort
+   — not just "is this one good" — use `etsy-catalog-triage` first: it
+   pulls real traffic and real competitor-saturation counts so the pick is
+   data-driven, and checks same-day-batch suppression risk before you
+   promote anything further.

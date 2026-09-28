@@ -5,7 +5,7 @@ category: "product"
 metadata:
   version: "1.0.0"
   agents: ["any"]
-  related_skills: ["etsy-api", "gumroad-api", "talos-product-launch-audit"]
+  related_skills: ["etsy-api", "gumroad-api", "talos-product-launch-audit", "etsy-catalog-triage"]
 ---
 
 # Etsy + Gumroad Repricing & SEO Rewrite
@@ -39,6 +39,10 @@ doing together whenever this pattern shows up:
    garbage" problem — worth a full rewrite, not an incremental swap.
 
 ## Step 0 — decide scope before touching anything
+
+If scope means picking 1-3 listings out of a larger catalog to prioritize
+(not "reprice everything"), use `etsy-catalog-triage` first — it pulls
+real traffic and competitor-saturation data so the pick isn't a guess.
 
 Pull current state from both platforms first (per `etsy-api` / `gumroad-api`)
 and look at it before planning changes:
