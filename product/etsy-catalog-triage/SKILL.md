@@ -61,6 +61,31 @@ while True:
 Each result includes `views`, `num_favorers`, and `creation_timestamp` —
 this alone answers whether the catalog has any real traffic yet.
 
+### 1a. Re-pull immediately before EVERY dispatch, not once per session
+
+A listing_id list built once and reused across a multi-hour session goes
+stale the moment real-world state changes underneath it — Charlie deleting
+listings for quality reasons, another session publishing/pulling products,
+or anything else external. Confirmed 2026-09-28 (helmsman lesson_id 3788):
+a 10-product audit batch was built once early in a session, then dispatched
+4+ times over several hours against the same fixed listing_id list. Three
+of the ten had gone genuinely 404 by later attempts — Charlie had deleted
+them from Etsy, and the shop's real active count dropped from 35 to 11
+during that same session window. Every retry against that stale batch was
+doomed regardless of brief wording, timeout budget, or output-format
+constraints, because the actual defect was upstream of the brief entirely:
+wrong inputs, not a broken pipeline. The failures looked exactly like
+agent/pipeline defects (truncated output, a worker corrupting its own
+script) and consumed several real debugging cycles before the actual cause
+(stale listing_ids) was found by walking the brief manually.
+
+**The rule this establishes: re-run the live listing pull (1) immediately
+before dispatching, and again before EACH retry** — not once when the
+batch was first identified. If a task keeps failing for reasons that don't
+obviously repeat (different symptom each time), check whether every
+external ID it names is still real and live before assuming the task
+content or pipeline is broken.
+
 ### 2. Check the batch-upload / suppression risk before promoting anything
 
 Group `creation_timestamp` by day. **A large fraction of the catalog
@@ -132,6 +157,7 @@ revenue today" quietly become a claim about organic search.
 
 ## Common mistakes
 
+- **Reusing a listing_id batch across multiple dispatch attempts without re-pulling live state first** — real-world state changes mid-session (deletions, new publishes), and retrying a stale batch produces symptoms that look like agent/pipeline bugs but are actually just wrong inputs. Re-verify before every dispatch, not once.
 - **Picking listings to fix by familiarity or "this seems like our best product"** instead of pulling real view/favorite/saturation numbers first — the whole point of this skill is that intuition about a 35+ listing catalog is usually wrong.
 - **Treating zero views as proof of a quality problem** on a shop/listing under ~2-3 weeks old — check age before diagnosing.
 - **Treating "no suppression evidence in the API" as "confirmed not suppressed"** — the API cannot see policy-review state; say what you actually checked and what remains unverifiable without the human's own dashboard/email access.
