@@ -95,6 +95,11 @@ Run `digital-product-quality-bar` plus these checks. Any failure blocks publish:
 - **Throttle:** 5-10 new listings per week at most, never a same-day batch.
   Etsy's 2026 enforcement flags rapid, similar-styled AI-pipeline uploads.
 - **Verify after every write** with a fresh GET. A 200 response is not proof.
+- **A content fix to a live product isn't done until the buyer download is replaced.**
+  Images and description are only half of it. Attach the rebuilt file with
+  `POST .../listings/{id}/files` (it's additive), then delete the old
+  `listing_file_id`. (2026-09-29: product 181's download still carried the
+  false total after the listing and images were fixed.)
 - **Re-pull live listing state before every dispatch or retry** in a long
   session. Charlie deletes listings in other sessions, and stale IDs look
   like pipeline bugs.
