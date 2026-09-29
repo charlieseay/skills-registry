@@ -3,9 +3,9 @@ name: "talos-product-launch-audit"
 description: "Run the audit-and-launch cycle for Talos-generated digital products before or after they go live on Etsy/Gumroad — quality verification, duplicate detection, pricing sanity check, listing-content validation, and inventory reconciliation. Also wired as an automated event-driven post-publish hook in listing-bot (helmsman/watch_approvals.py calling src/workers/post_publish_audit.py) that runs scoped per-product checks and immediately auto-deactivates defects on the spot. Use this whenever Talos has produced a new batch of products, whenever Charlie asks to \"get products ready to publish,\" \"clean up the shop,\" \"check for duplicates/false advertising,\" or on any recurring cadence (weekly/monthly) as Talos keeps shipping."
 category: "product"
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   agents: ["any"]
-  related_skills: ["etsy-api", "gumroad-api", "product-quality-verify", "fix-listing-content-violations", "state-reconciliation"]
+  related_skills: ["etsy-api", "gumroad-api", "product-quality-verify", "fix-listing-content-violations", "state-reconciliation", "credential-and-tool-verification"]
 ---
 
 # Talos Product Launch Audit — the recurring cycle
@@ -133,6 +133,30 @@ found repeatedly on 2026-09-21:
   destroys discoverability — check a sample of live tags across the
   catalog for this pattern, especially on any shop with real listings but
   zero/near-zero views.
+- **Leaked working-file headings in titles/descriptions** (found
+  2026-09-26, 6 live listings): a `phase-3/etsy-listing-copy.md` file's
+  own H1 heading — literally `# Etsy Listing Copy — <Product> (Fillable
+  PDF)` — got taken as the live product title verbatim, e.g. "Etsy Listing
+  Copy — Monthly Budget Planner (Fillable PDF)". Root cause:
+  `publish_product.py`'s title extraction applied its leaked-language
+  sanitizer to the description field only, never to the title/H1. Fixed
+  same date (sanitizer now runs on the H1 before it's accepted as the
+  product name; `validators.py`'s pre-publish gate also now rejects this
+  phrase family independently). When scanning titles for leaks, check for
+  the literal words "Listing Copy" in addition to "Product #N"/"Strategy
+  Item #N" — same defect class, different leaked source string.
+- **Marketing-filler words as tags** (found 2026-09-26, 4 live listings):
+  `perfect`, `stop`, `wondering`, `comprehensive`, `control` as literal
+  Etsy tags — not internal-pipeline jargon like the ad-campaign leak above,
+  just generic marketing-copy words with no buyer search intent, pulled in
+  because the tag generator's stop-word list only filtered grammatical
+  filler (articles, prepositions). Fixed same date by adding a
+  marketing-filler word list alongside the grammatical one in
+  `seo/keywords.py`. Distinguish this from the ad-campaign leak: that one
+  needs new pattern entries as new jargon appears, this one is closer to a
+  quality/relevance judgment — when scanning tags, ask "would a real buyer
+  type this into Etsy search?" for anything that isn't an obvious product
+  noun.
 - **Leaked internal ID prefixes in titles** (found 2026-09-25): titles
   like "Product #54: Soccer Social Media Templates Bundle", "Digital Product:
   All Fonts Pack", or "Product #item-157: Meditation Journal". This happens
@@ -165,10 +189,83 @@ found repeatedly on 2026-09-21:
   leaks. When auditing any product with a generated (not photographed)
   cover/preview image, visually inspect it — don't assume a passing
   content-validator run means the images are clean too.
+- **External delivery links a buyer can't actually open** (found
+  2026-09-29, 2 live listings: product-item-140 Bold Instagram and 143 Y2K
+  Instagram, 20 links). Worse than every other pattern here. Those are
+  discoverability or trust problems. This one is "customer paid, got
+  nothing": the listing sells "10 fully editable Canva templates" and the
+  editable part is a link. Both products' `canva-source-links.md` held
+  `canva.com/d/<id>` short links from the Canva generate-design flow. In a
+  real anonymous browser every one redirects to Canva login ->
+  `/api/design/<token>/edit`, and the token header's `expiry` is exactly 30
+  days after the designs were generated (hard-dead 2026-10-08 either way).
+  These are Connect API `edit_url`s: they open only for the account that
+  made them. They are not share links, and no sharing setting fixes them.
+  What a buyer needs is Canva's Share > **Template link**, one per design.
+  It can only be made by a human in the Canva UI. Neither the Connect API
+  nor the Notion API (see `digital-product-quality-bar`'s Notion Marketplace
+  section) has a publish/share endpoint. Say so plainly and hand Charlie the
+  exact URLs. Don't imply it's auto-fixable, and don't "fix" it by swapping
+  in some other link you can't verify.
+
+  The gate check is `qa_gate.py`'s `check_external_prerequisites()`, which
+  reports as `external_prerequisites_satisfied`. It is in
+  `HUMAN_PREREQ_CHECKS`, so a product failing only this lands on
+  `READY_FOR_REVIEW` (exit 3), not `FAIL`. **`READY_FOR_REVIEW` on a live
+  listing is not "fine" — it means buyers are purchasing an incomplete
+  product right now.** Two traps, both hit today:
+  1. **A raw HTTP 403 is not proof of "not public".** Canva sits behind
+     Cloudflare, which returns `403` + `cf-mitigated: challenge` to every
+     non-browser client, including for canva.com's own homepage. The gate
+     used to report this as "not published / not public". That diagnosis
+     was wrong: the real cause was the link type. Since 2026-09-29 the gate
+     labels challenge-403s as unverifiable-by-HTTP and fails known
+     never-deliverable link shapes (`canva.com/d/…`, `canva.com/api/design/…`,
+     `canva.com/design/<id>/<token>/edit`) deterministically, even with
+     `--no-network`. For anything the gate can't classify, open the URL in
+     a real browser in an isolated/anonymous context (chrome-devtools
+     `new_page` with `isolatedContext`). Record where it lands: login wall,
+     "Use template" button, 404. Don't record just a status code.
+  2. **Run it before go-live AND on a cadence after.** A share setting can
+     be revoked, and a Connect edit URL silently expires 30 days in.
+     Mechanical sweep: every `http(s)` URL in listing copy and in every
+     customer-facing file (`canva-source-links.md`, README, delivery PDFs),
+     one real-browser load each, fail on anything that isn't the public
+     page itself.
+  Pulling a listing for this needs Charlie's call (see "Pulling a listing").
+  Zero views/sales lowers the urgency but doesn't remove the need to ask.
+- **Format/spec claims never checked against the files** (found 2026-09-29,
+  2 live listings: product-item-176 Engineering, 177 Travel & Wine). The
+  listings and README promised "print-ready PDF (US Letter, 300 DPI)",
+  "pure vector" and "PNG 2000x2600px". `pdfinfo`/`pdfimages -list` showed
+  1500x1500pt square pages embedding an 800px raster (38 ppi native, about
+  107 ppi when fit to Letter), with PNGs at 2000x2000. The deliverable was
+  lower-res than the PNG sitting next to it. No gate check compares a stated
+  size/DPI/format with the file. For any listing that states page size,
+  DPI, pixel dimensions or "vector", run `pdfinfo` + `pdfimages -list` (PDF)
+  or read the image size (PNG/JPG) and compare. Fixed same date by
+  rebuilding the print PDFs as true US Letter from the 2000px PNGs
+  (reportlab, 8-bit gray, 267 ppi, never PyMuPDF) and correcting the copy
+  that was still false.
+
+**Presentation and deliverable are two independent axes** (standing
+reminder, 2026-09-29). On this date all 11 live listings got real
+hero-image and copy fixes and Charlie approved them. Only a check done
+*afterward* showed that 4 of those 11 had FAIL content verdicts
+(140/143 broken Canva links, 176/177 false format specs, plus leaked
+working-file headings in the source copy) and that 2 (176/177) had never
+been graded at all (no `phase-4/qa-report.json`). A great storefront says
+nothing about whether the zip is right. **After any storefront/presentation
+round, re-run `qa_gate.py` against every product touched before calling it
+"done."** Re-run it: don't read the cached `qa-report.json`. The same day,
+143's cached report said `READY_FOR_REVIEW` while a fresh run said `FAIL`,
+and 221's said `FAIL` while a fresh run said `PASS`. A cached report is as
+stale as a cached STATUS.json error.
 
 Any confirmed hit in this phase (undisclosed spec-as-product, content
-mismatch, corruption, leaked scratchpad text, or leaked internal ID prefix)
-gets pulled from sale immediately (both platforms), before moving to Phase 3.
+mismatch, corruption, leaked scratchpad text, leaked internal ID prefix, or
+a delivery link the buyer can't open) gets pulled from sale immediately
+(both platforms), before moving to Phase 3.
 See "Pulling a listing" below for the exact mechanics and the standing authorization
 boundaries. A disclosed build-spec or a leaked-tags problem does not need
 pulling — fix in place (rewrite tags, no listing downtime required).

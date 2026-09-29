@@ -164,6 +164,17 @@ not initial publish) does **not** yet — it will hit the same 400 if ever
 asked to replace a file over the limit. Extend the same split logic there
 if that path is needed for an oversized replacement.
 
+**Multi-part replace hits the 5-file cap mid-way** (confirmed 2026-09-29,
+listing 4581333085): the upload-first-then-delete order runs out of room
+once old parts + new parts > 5. With 3 old parts attached, new part1 and
+part2 uploaded and new part3 got a bare `400` on `POST .../files`, which
+left 5 files and a mixed deliverable. Recovery: list the files, delete
+the known OLD ids explicitly, upload the remaining new parts, then
+re-fetch and assert the set equals exactly the new ids. Plan the order up
+front: if `len(old) + len(new) > 5`, upload `5 - len(old)` new parts,
+delete all old ones, then upload the rest. This keeps the listing from
+ever dropping to zero files.
+
 If you hit "exceeds the maximum file size" anywhere else in this codebase
 (or a different publisher entirely), this is the fix pattern — don't
 re-diagnose from scratch.
@@ -348,6 +359,15 @@ If the newly-uploaded image was already next in line, this correctly
 makes it the new hero. Always re-fetch `GET .../images` after the delete
 to confirm the order landed the way you expect — don't assume from the
 delete call's 204 alone.
+
+**Root cause found 2026-09-29 (see `etsy-hero-image-generation`):** the
+`rank` form field on `POST .../images` IS honored, and it **defaults to 1**.
+That default is why a fresh upload ties with the old hero. Always pass
+`rank` explicitly (`1` for a new hero, `len(images)+1` to append). A
+mid-list rank ties instead of shifting the others down, and ties are served
+in ascending `listing_image_id` order. Listings accept more than 10 images
+(12 confirmed). `etsy-hero-image-generation/scripts/etsy_images.py hero`
+wraps the whole replace-and-verify sequence.
 
 ## A documented Etsy quirk: activation response, not a follow-up GET, is the real confirmation
 
