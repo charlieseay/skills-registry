@@ -345,6 +345,14 @@ every tag is ≤20 characters and there are no duplicate tags before writing
 
 ### Phase 6 — Inventory reconciliation
 
+**This now runs on a schedule** (launchd `com.seayniclabs.etsy-catalog-reconcile`,
+every 6h): `claude-config/bin/etsy-catalog-reconcile.py` diffs live Etsy (all
+states) against the Helmsman CMDB digital rows and `store.db`
+`published_listings`, and files ONE `Etsy catalog drift` task (CLAUDE) with the
+exact items when they disagree. It never edits anything itself. Run it by hand
+first in any audit (`--json` for machine output); exit 0 means in sync. The
+manual procedure below is what that task's executor follows.
+
 Update the `published_listings` table (in whatever repo currently owns it
 — check `state-reconciliation`-style before assuming a schema exists,
 since this project has had this table built in the wrong repo once

@@ -3,7 +3,7 @@ name: "etsy-api"
 description: "Query or manage the Seaynic Labs Etsy shop via the Etsy Open API v3 — list active/inactive listings, check for duplicate or existing listings before publishing anything new, look up a single listing, or deactivate/update one. ALSO covers searching ALL of Etsy (competitor research) via the public findAllListingsActive endpoint — free, no third-party scraper needed, works even when Apify is capped. Use this whenever a task involves Etsy listings, Etsy publishing, Etsy pricing, checking what's live on Etsy, competitor/market research on Etsy, or before any code/agent creates a new Etsy listing. Also use it to investigate Etsy OAuth/token errors, 403s mentioning \"shared secret\", or listing-fee cost questions. Do not hand-roll Etsy OAuth or guess at API headers, and do not reach for Apify/a third-party scraper for Etsy search — this skill has the exact working pattern and known gotchas for both our own shop management and public competitor search."
 category: "product"
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   agents: ["any"]
   related_skills: ["gumroad-api", "talos-product-launch-audit", "state-reconciliation"]
 ---
@@ -68,6 +68,27 @@ client_id passes Etsy's basic auth check but fails deeper in, returning:
 
 with HTTP 403. This looks like a missing/invalid key problem — it's actually
 a malformed header. Always build `x-api-key` as `f"{client_id}:{client_secret}"`.
+
+## Use the module first: `platforms.etsy_shop`
+
+For any read or write, import the shared client instead of hand-building URLs:
+
+```python
+import sys; sys.path.insert(0, "/Volumes/data/projects/listing-bot/src")
+from platforms.etsy_shop import EtsyShop, EtsyVerifyError
+shop = EtsyShop()
+shop.update_listing(lid, tags=[...], description="...")  # shop-scoped PATCH, re-fetched + compared
+shop.set_price(lid, 4.99)                                 # listing-scoped inventory PUT, verified
+shop.replace_hero(lid, "hero.png", alt="...")            # upload rank=1, delete old, assert first
+shop.replace_file(lid, old_file_id, "customer-package.zip")  # shop-scoped files, verified
+```
+
+The endpoint scoping below lives in ONE table there (`_ROUTES`), and every write
+raises `EtsyVerifyError` when a re-fetch does not show the change, so a silent
+no-op fails loudly. It also rejects markdown in descriptions (Etsy shows `**`
+literally), over-long/over-count tags, and `price` in a PATCH. The raw pattern
+below is kept for reference and for calls the module does not wrap yet -- if
+you need one, add it to `_ROUTES` rather than writing another one-off script.
 
 ## Canonical usage pattern
 
