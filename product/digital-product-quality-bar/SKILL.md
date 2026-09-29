@@ -5,7 +5,7 @@ category: "product"
 metadata:
   version: "1.0.0"
   agents: ["any"]
-  related_skills: ["talos-product-launch-audit", "product-quality-verify", "etsy-gumroad-reprice-seo", "etsy-api", "etsy-catalog-triage"]
+  related_skills: ["talos-product-launch-audit", "product-quality-verify", "etsy-gumroad-reprice-seo", "etsy-api", "etsy-catalog-triage", "digital-product-playbook"]
 ---
 
 # Digital Product Quality Bar

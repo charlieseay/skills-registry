@@ -5,7 +5,7 @@ category: "product"
 metadata:
   version: "1.0.0"
   agents: ["any"]
-  related_skills: ["etsy-api", "digital-product-quality-bar", "etsy-gumroad-reprice-seo", "product-quality-verify"]
+  related_skills: ["etsy-api", "digital-product-quality-bar", "etsy-gumroad-reprice-seo", "product-quality-verify", "digital-product-playbook"]
 ---
 
 # Etsy Catalog Triage
