@@ -121,6 +121,8 @@ Base URL: `https://openapi.etsy.com/v3/application`
 | Update price/quantity | `PUT /listings/{listing_id}/inventory` — see below, NOT the plain PATCH |
 | Create a new listing | `POST /shops/{shop_id}/listings` |
 | Delete a listing | `DELETE /listings/{listing_id}` — **listing-scoped, no shop_id.** `DELETE /shops/{shop_id}/listings/{listing_id}` 404s (same shop-vs-listing-scoped trap as GET above), confirmed 2026-09-23 deleting 6 dead duplicate drafts. |
+| Upload/replace a digital file | `POST /shops/{shop_id}/listings/{listing_id}/files` — **shop-scoped.** Multipart, same as image upload. |
+| Delete a digital file | `DELETE /shops/{shop_id}/listings/{listing_id}/files/{listing_file_id}` — **shop-scoped, opposite of the listing-scoped delete pattern above.** `DELETE /listings/{listing_id}/files/{listing_file_id}` (no shop_id) 404s — confirmed 2026-09-29 replacing a broken customer-package.zip on 2 live listings. Files use the SAME scoping as their own upload endpoint (shop-scoped), not the listing-scoped pattern that listings/images/inventory use elsewhere in this table — don't assume every delete endpoint in this API follows one convention. |
 
 `state=active` is the one that matters for duplicate-checking and for "what's
 actually live" questions — `inactive`/`draft` listings aren't costing listing
