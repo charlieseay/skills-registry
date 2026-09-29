@@ -201,12 +201,38 @@ found repeatedly on 2026-09-21:
   days after the designs were generated (hard-dead 2026-10-08 either way).
   These are Connect API `edit_url`s: they open only for the account that
   made them. They are not share links, and no sharing setting fixes them.
-  What a buyer needs is Canva's Share > **Template link**, one per design.
-  It can only be made by a human in the Canva UI. Neither the Connect API
-  nor the Notion API (see `digital-product-quality-bar`'s Notion Marketplace
-  section) has a publish/share endpoint. Say so plainly and hand Charlie the
+  What a buyer needs is Canva's Share > **Template link** (a distinct menu
+  item, NOT the "Public view link" icon that sits next to it in the same
+  share row — confirmed live 2026-09-29 by actually clicking through as an
+  anonymous visitor in an isolated browser context). Public view link
+  resolves clean (HTTP 200, no Cloudflare block) and looks like a fix
+  because the design renders — but its only call-to-action for an
+  anonymous viewer is a generic "Create with Canva" button that opens
+  Canva's signup modal with **no evidence it imports the source design**
+  afterward. It is not a template-duplication link, it is a read-only
+  preview. Don't stop at "the link returns 200 now" — open it in a real
+  isolated browser session and check for an actual **"Use template"**
+  button, not just a lack of errors.
+
+  **Template link requires Canva Pro (or Teams/Education/Nonprofits) on the
+  account that owns the design to CREATE — confirmed 2026-09-29, Canva
+  restricted this from Free plans starting February 2025.** Recipients only
+  need a free Canva account to *use* one once it exists. If Charlie's
+  account turns out to be on Free, this entire product category is blocked
+  until a Pro upgrade, not just these 20 links — check the account's plan
+  tier before assuming the fix is a simple click. "Brand Template" (a third
+  share-row option) is NOT the mechanism either — it's Teams/Enterprise-only
+  and has no anonymous/public access mode by design.
+
+  It can only be made by a human in the Canva UI — no API. Neither the
+  Connect API nor the Notion API (see `digital-product-quality-bar`'s
+  Notion Marketplace section) has a publish/share endpoint, and browser
+  automation against Canva's Share UI is both fragile and a Terms of
+  Service violation (account suspension risk) — don't build or suggest a
+  Playwright/Puppeteer script for this. Say so plainly and hand Charlie the
   exact URLs. Don't imply it's auto-fixable, and don't "fix" it by swapping
-  in some other link you can't verify.
+  in some other link you can't verify actually shows "Use template" to an
+  anonymous viewer.
 
   The gate check is `qa_gate.py`'s `check_external_prerequisites()`, which
   reports as `external_prerequisites_satisfied`. It is in
