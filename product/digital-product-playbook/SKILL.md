@@ -19,6 +19,29 @@ chosen without demand data, filler copy from a generator, one near-duplicate
 preview image, and a price claim nobody checked. Every step below closes one
 of those gaps.
 
+## Directory phases vs. playbook steps -- these are two different numbering schemes
+
+**Added 2026-10-01** after confusion over why customer-facing files live in
+`phase-3/`, not the highest-numbered directory. Every product directory under
+`talos-tools/digital-products/product-item-<N>/` uses a fixed 5-stage
+pipeline that does NOT map one-to-one onto this skill's numbered steps above:
+
+| Directory | Contains |
+|---|---|
+| `phase-0/` | Research: demand/saturation data, competitor research, market analysis |
+| `phase-1/` | Design/build: render scripts, design notes, source HTML/CSS |
+| `phase-2/` | Generation: raw exports from the build tool (Canva PDFs, rendered images) |
+| `phase-3/` | **Packaging: the actual customer-facing deliverable** (`customer-package/` or `customer-package.zip`), preview/marketing images (`preview-mockups/`), and the Etsy listing copy |
+| `phase-4/` | QA/submission: the quality-bar audit report and submission checklist, run AFTER phase-3 is packaged |
+
+So `phase-3` is not "the third of five content stages" — it is the specific,
+fixed name for "packaged and ready to sell," and `phase-4` is a review gate
+on top of it, not a later content stage. A fix to the customer-facing
+product always lands in `phase-3/customer-package/`, never a higher-numbered
+phase. When editing a live product, locate the real shipped file via this
+table rather than assuming the highest phase number holds the newest
+customer-facing content.
+
 ## 1. Choose what to build -- demand first
 
 Build nothing without both signals:
@@ -48,7 +71,40 @@ For the top 3-5 results in the chosen phrase, record:
 Our deliverable must match or beat the best competitor on every axis we
 charge for. Record the comparison in `phase-0/competitor-research/`.
 
-## 3. Build -- graphics
+## 3. Find the differentiation gap -- what do ALL competitors miss?
+
+**Added 2026-10-01, confirmed on the Tent Camping Checklist (product-item-225):**
+step 2's competitor pull answers "do we match the market." This step asks a
+different question: "what does the ENTIRE top-5 field fail to offer that a
+buyer in this niche would genuinely want?" Matching competitors ships a
+product that's merely competitive; closing a gap none of them cover ships
+one that's structurally better, not just better-executed.
+
+Look across all 3-5 comps pulled in step 2 for a shared absence, not just
+individual weaknesses:
+- Do none of them include genuinely useful **reference/educational content**
+  adjacent to the product's core function? (The camping checklist case: 5
+  real competitors, all pure packing-list PDFs, zero instructional content —
+  adding a few reference pages on knots, fire-starting, and water safety
+  turned a commodity checklist into the only guide-plus-checklist in the
+  niche, for near-zero marginal cost since the base pipeline already existed.)
+- Do none of them offer real editability (see `digital-product-quality-bar`
+  section 1) when the category's buyers clearly want to customize?
+- Do none of them segment by use-case/audience when the audience is
+  obviously not homogeneous (trip type, skill level, dietary need, etc.)?
+
+If a genuine, low-cost-to-close gap exists across the whole field, closing it
+is higher-leverage than polishing copy or images on a me-too product. Record
+the gap and the fix in `phase-0/competitor-research/` alongside the
+comparison table, and reflect it in the listing copy's differentiation
+language (not just a feature bullet — a buyer should understand immediately
+why this listing and not the other 20 nearly-identical ones). **Bonus
+content must still clear the same visual bar as the rest of the product**
+(see `pdf-form-generation`'s "Illustrated themes" section) — a wall of plain
+text bolted onto a well-designed product looks like an afterthought and
+undercuts the differentiation it's supposed to deliver.
+
+## 4. Build -- graphics
 
 - Functional previews (the real pages in a device or desk context) are
   rendered from the actual product files.
@@ -61,7 +117,7 @@ charge for. Record the comparison in `phase-0/competitor-research/`.
   `md5 -q phase-3/preview-mockups/*.png | sort | uniq -d` must print nothing.
   (2026-09-28: product 181's "4 images" were 2 files saved twice each.)
 
-## 4. Listing copy -- SEO researched, no AI slop, facts checked
+## 5. Listing copy -- SEO researched, no AI slop, facts checked
 
 - **Title** (140 characters max): buyer phrase first, then audience/format.
 - **13 tags** (20 characters each max, no duplicates, no single filler words):
@@ -78,19 +134,21 @@ charge for. Record the comparison in `phase-0/competitor-research/`.
   note, or LLM output. (2026-09-28: product 181 claimed a $1,378 total; its own
   grid totals $1,750.06.)
 
-## 5. Pre-publish gate
+## 6. Pre-publish gate
 
 Run `digital-product-quality-bar` plus these checks. Any failure blocks publish:
 
 - [ ] Demand + saturation evidence is recorded (step 1)
 - [ ] Competitor comparison is recorded, and we meet or beat it (step 2)
+- [ ] Differentiation gap considered and, if a genuine one exists, closed or
+      explicitly deferred with a reason (step 3)
 - [ ] 5+ distinct images (md5 check above)
 - [ ] Title/tags valid; tags sourced from real buyer terms
 - [ ] Description is sectioned, has no banned phrases, and every number is verified
 - [ ] No internal identifiers (`Product #item-N`, working-file headings) in
       any customer-facing file, the local listing copy included
 
-## 6. Publish -- throttled, verified, and surfaced correctly
+## 7. Publish -- throttled, verified, and surfaced correctly
 
 - **Throttle:** 5-10 new listings per week at most, never a same-day batch.
   Etsy's 2026 enforcement flags rapid, similar-styled AI-pipeline uploads.
@@ -107,8 +165,37 @@ Run `digital-product-quality-bar` plus these checks. Any failure blocks publish:
   Charlie's Inbox on its own (`charlie-inbox-filing` Kind 2). A question with
   options is a strategy item (Kind 3), not a task.
 
-## 7. After launch
+## 8. After launch
 
 Wait 2-3 weeks for organic indexing before judging traffic. Then triage with
 `etsy-catalog-triage`. No paid ads until products are proven good (Charlie's
 call, 2026-09-28).
+
+## 9. Retrofitting existing catalog products
+
+**Added 2026-10-01.** Steps 1-6 describe building a new product. The same
+gate applies to anything already shipped — a product built before step 3
+existed, or before `pdf-form-generation`'s illustrated-theme fixes landed,
+can still be retrofitted. This is cheap, low-risk work specifically **while
+the catalog has no real sales/traffic yet** (zero live customers means zero
+risk of confusing existing buyers with a changed deliverable) — do this
+audit now rather than after launch pressure makes it harder to prioritize.
+
+For each existing product:
+1. Re-pull step 2's competitor comparison fresh (comps and their
+   favorites/reviews change over time) and re-run step 3's differentiation
+   check against it — a product built before this step existed was never
+   checked against "what does the whole field miss."
+2. Check visual tier against `pdf-form-generation`'s "Illustrated themes"
+   section even if the product predates that section — a flat, color-header-
+   only PDF competing against illustrated comps has the same structural gap
+   regardless of when it shipped.
+3. Prioritize by effort-to-impact, not by product age: a near-zero-cost gap
+   close (e.g. 2-3 bonus reference pages reusing an already-built pipeline)
+   beats a full visual rebuild of a product that's already visually
+   competitive. Use `etsy-catalog-triage`'s data-driven approach to pick
+   which products get today's effort if there are many candidates.
+4. Still respect the stagger-launch rule for re-publishing updates — don't
+   batch-update the whole catalog in one session even if no traffic risk
+   exists yet; verify each retrofit fully (per this skill's step 6 gate)
+   before moving to the next.

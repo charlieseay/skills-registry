@@ -37,6 +37,8 @@ render_layout.py inventing its own ad-hoc styling.
   --radius-md: 8px;
   --radius-pill: 999px;
 
+  /* Display font can be overridden per product (e.g., "Fredoka" for camping,
+     "Caveat" for wellness). Defaults to display-weight Poppins. */
   --font-display: "Poppins", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Helvetica Neue", Arial, sans-serif;
 }

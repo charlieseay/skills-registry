@@ -155,6 +155,9 @@ close the quality gap).
       fine.
 - [ ] 2000×2000px minimum resolution, 3000×3000px preferred; no
       watermarks obscuring the actual product.
+- [ ] **How to actually produce these:** `etsy-hero-image-generation`
+      (Fal.ai backdrop for about $0.06 per product, plus a deterministic
+      title/badge/infographic compositor and a verified live hero swap).
 - [ ] A short looping video (screen recording of the product in use)
       measurably outperforms listings without one — add when feasible.
 
@@ -366,7 +369,20 @@ thumbnail alone:**
    no regeneration, no new skill needed, just fixing what the pipeline
    already had.
 
-## Rapid audit sequence for an existing catalog
+## The confident-wrong-verdict trap — claiming a gap without looking at the current pixels
+
+**Confirmed twice in one session, 2026-10-01, on a single catalog-retrofit audit batch.** Two separate research agents, each asked to verify whether a specific product's hero image lacked a particular feature (a differentiator callout, a page-count badge, a title overlay), wrote detailed, specific, confident reports claiming the feature was absent or undersold — complete with named competitor comparisons and effort estimates. Both verdicts were **flatly wrong**: a human who actually downloaded and looked at the current live hero image found the exact feature prominently present (a bold "TABLET CHECKLISTS" badge with a real mockup in one case; a "16 PAGES / 290 FIELDS" badge plus title overlay plus a 5-page fan collage in the other). Both reports were well-written and well-organized enough to look authoritative — prose quality was not evidence of accuracy.
+
+**Root cause, both times:** the agent reasoned from secondary sources — STATUS.json notes, file names, a stale local copy, a prior audit's written description, or an assumed "pattern" from similar products — instead of fetching the CURRENT live image from Etsy and actually describing what is visible in it. A confident paragraph about "the hero image shows X" is worthless unless it followed an actual image fetch-and-view in that same work session.
+
+**The rule this section exists to enforce:** before writing any claim of the form "the hero/listing image lacks/undersells/doesn't show [feature]," the agent must, in the same session:
+1. Pull the CURRENT live image URL via a fresh Etsy API call (not a cached list, not a local preview-mockups file that may be stale or superseded) — `GET /listings/{id}/images`.
+2. Download and actually view that exact image (Read it as an image — do not infer content from its filename, dimensions, or a STATUS.json description).
+3. Describe literally what is visible — badges, text overlays, callouts, page counts — before concluding anything is missing or undersold.
+
+**Red flag that this step was skipped:** a report that cites STATUS.json wording, a competitor-audit file's prior description, or "the pattern from similar products" as evidence for what the CURRENT listing's image shows, without a fresh image URL and a direct view in the same response. Treat any such claim as unverified until someone actually opens the image.
+
+**When reviewing a subagent's audit report making this kind of claim:** don't relay it to Charlie or act on it until you've independently pulled and viewed the same image yourself. This is not optional diligence — it is the only way this specific failure mode gets caught, since the report itself reads as confident and complete either way.
 
 1. Pull image count for every live listing via the Etsy images endpoint —
    this is the fastest, purely mechanical first signal (see `etsy-api`
