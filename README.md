@@ -106,11 +106,13 @@ Skills must be registered in `helmsman.db` for auto-discovery:
 
 ```bash
 # Auto-sync all skills
-python3 /path/to/sync_skills_to_helmsman.py
+python3 ~/Projects/claude-config/bin/skill-registry-sync
 
 # This runs automatically:
-# - Daily at 3:00 AM (cron)
-# - After git push (post-commit hook)
+# - Daily at 06:20 (launchd: com.seayniclabs.skill-registry-sync)
+# - After any commit to this repo OR to claude-config's skills/ (post-commit
+#   hook — install with ~/Projects/claude-config/bin/install-git-hooks after
+#   a fresh clone, since .git/hooks/ is never cloned)
 # - On demand when adding new skills
 ```
 
