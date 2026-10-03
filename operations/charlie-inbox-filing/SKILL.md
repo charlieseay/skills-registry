@@ -114,13 +114,27 @@ templates (no local preview-able file) will correctly show "No deliverable
 file recorded for this product yet," which is honest, not a bug to work
 around.
 
-**Approve / reject wiring**, if you're building UI or automation against
-this rather than just making sure a product surfaces correctly:
+**Approve / revise / reject wiring**, if you're building UI or automation
+against this rather than just making sure a product surfaces correctly.
+**Correction 2026-10-03**: this skill previously said "Reject" meant
+`/revise` — that was the actual bug, not just stale docs. Bridge's own
+Reject button silently called `/revise` for months, so a rejected product
+got a new Talos rework task instead of being archived, and kept
+resurfacing with the same quality problems. Fixed in bridge commit
+`f108509`. These are now three genuinely distinct endpoints:
 - Approve: `POST /api/products/<num>/approve` — refuses unless
   `phase-4/qa-report.json` shows a clean PASS. Writes
   `phase-4/approval.json`.
-- Reject: `POST /api/products/<num>/revise` with `{"notes": "<required, specific feedback>"}`
-  — files a new `owner: TALOS` revision task with those notes as the brief.
+- Request Revision: `POST /api/products/<num>/revise` with
+  `{"notes": "<required, specific feedback>"}` — files a new `owner: TALOS`
+  revision task with those notes as the brief. The product comes back
+  into the review queue once the rework ships.
+- Reject (permanent): `POST /api/products/<num>/reject` with
+  `{"notes": "<required reason>"}` — marks `STATUS.json` `rejected: true`
+  with the reason, archives any open Talos tasks, marks the matching
+  strategy catalog item rejected so it is never re-picked for a future
+  build. No rework task. This is the one to use when the answer is "not
+  worth fixing," not "fix this specific thing."
 
 ## Kind 3 — Strategy idea (Charlie needs to pick a direction, not just approve/reject)
 
@@ -161,6 +175,33 @@ with `{"status": "rejected"}` is correct for an outright reject; anything
 that represents Charlie actually choosing something goes through
 `/feedback`.
 
+## Kind 4 — Stuck task (an agent gave up and needs a human to unblock it)
+
+**You do not file anything for this either.** Added 2026-10-03, same day
+the Products bug below was found and fixed. If a task genuinely exhausts
+its own retries and you (the agent) set `status: "needs_human_review"` on
+it in Helmsman -- the normal, correct thing to do when you're stuck -- it
+now surfaces automatically in the Inbox's "Stuck Tasks" filter. Before this
+date, `needs_human_review` was a real, correct signal that went nowhere:
+nothing in Bridge ever read it, so two real tasks sat invisible to Charlie
+for hours with no way for him to know they existed. Don't route around this
+by manually filing a Decision for a stuck task -- that's the Kind-2 mistake
+pattern again, just for a different source.
+
+What Charlie sees: your `last_failure_output` (the single most useful
+field -- say what you actually tried and why it didn't work, not just
+"failed") and the most recent QA summary if one exists. He can Dismiss (no
+further action needed -- mark `status: cancelled`) or Requeue with
+guidance, which appends his note to your `brief_text` and resets
+`status: pending, retry_count: 0` so you get a real second shot armed with
+what you were actually missing.
+
+**If you're about to mark a task `needs_human_review`:** write
+`last_failure_output` like you're explaining to a colleague what you tried
+and where you got stuck, not a generic error string -- that text is now
+the primary thing that decides whether Charlie can act on it in 10 seconds
+or has to go dig through the task record himself.
+
 ## Quick decision table
 
 | What you have | File it as | Endpoint |
@@ -168,8 +209,10 @@ that represents Charlie actually choosing something goes through
 | A one-off approval/question with no product behind it | Decision | `POST /decisions` |
 | A finished, QA-passed digital product | **Nothing** — it surfaces on its own if `phases.4` is set correctly | n/a (verify STATUS.json shape) |
 | An idea, or a multi-option fork Charlie needs to pick from | Strategy item | `POST /strategy` |
-| Charlie approving/rejecting a product | (handled by the Inbox UI) | `POST /api/products/<num>/approve` or `/revise` |
+| A task you (an agent) genuinely cannot finish alone | **Nothing** — set `status: needs_human_review` with a real `last_failure_output`; it surfaces on its own | `PATCH /tasks/<num>` |
+| Charlie approving/rejecting a product | (handled by the Inbox UI) | `POST /api/products/<num>/approve`, `/revise`, or `/reject` |
 | Charlie picking a strategy option or answering a question | (handled by the Inbox UI) | `POST /api/strategy/<id>/feedback` |
+| Charlie dismissing or requeuing a stuck task | (handled by the Inbox UI) | `POST /api/tasks/<num>/dismiss` or `/requeue` |
 
 ## Before you file anything
 
