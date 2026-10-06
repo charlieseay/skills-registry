@@ -196,6 +196,7 @@ Package the coloring-book product for Talos distribution:
 2. **Listing copy structure** (per `digital-product-quality-bar`):
    - **Headline**: benefit-focused ("Unwind with 20 intricate coloring pages — detailed line art for hours of meditative creativity")
    - **What's included** (bullets): "20 full-page coloring designs", "Print-ready PDF at 300 DPI", "High-resolution PNG files for iPad/tablet coloring apps (Procreate, GoodNotes, Notability)", "Themes: mandalas, nature scenes, [specific themes]"
+   - **Plain text only.** Etsy does not render Markdown: `**bold**` and `### Heading` show to buyers as literal symbols (8 of 15 live listings, 2026-10-06). Use CAPS for section labels and `• ` for bullets. `platforms.etsy.etsy_plain_text()` strips it at publish, but write the copy file clean (see `digital-product-quality-bar` section 3).
    - **Who this is for**: niche description ("Adults seeking intricate line art for relaxation and creative expression")
    - **Delivery**: "Instant digital download. Print at home, local print shop, or bring PDF to online print service. Use PNG files in your favorite tablet coloring app."
    - **File specs**: "PDF (300 DPI, 8.5×11 in, black line art on white), PNG (2000×2600 pixels, RGB)"

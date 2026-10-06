@@ -277,6 +277,7 @@ Package the card product for Talos distribution:
 2. **Listing copy structure** (per `digital-product-quality-bar`):
    - **Headline**: benefit-focused ("Keep your loved one smiling on their special day — 3 personalized card variants, ready to print")
    - **What's included** (bullets): "3 card designs (birthday, milestone, humorous variant)", "Print-ready PDF at 300 DPI", "Digital-only download — nothing ships physically"
+   - **Plain text only.** Etsy does not render Markdown: `**bold**` and `### Heading` show to buyers as literal symbols (8 of 15 live listings, 2026-10-06). Use CAPS for section labels and `• ` for bullets. `platforms.etsy.etsy_plain_text()` strips it at publish, but write the copy file clean (see `digital-product-quality-bar` section 3).
    - **Who this is for**: niche description
    - **Delivery**: "Instant download link to PDF. Print at home, local print shop, or via online print service."
    - **File specs**: "PDF (300 DPI, 5×7 in), suitable for cardstock or premium paper"

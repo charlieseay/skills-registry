@@ -3,7 +3,7 @@ name: "etsy-api"
 description: "Query or manage the Seaynic Labs Etsy shop via the Etsy Open API v3 — list active/inactive listings, check for duplicate or existing listings before publishing anything new, look up a single listing, or deactivate/update one. ALSO covers searching ALL of Etsy (competitor research) via the public findAllListingsActive endpoint — free, no third-party scraper needed, works even when Apify is capped. Use this whenever a task involves Etsy listings, Etsy publishing, Etsy pricing, checking what's live on Etsy, competitor/market research on Etsy, or before any code/agent creates a new Etsy listing. Also use it to investigate Etsy OAuth/token errors, 403s mentioning \"shared secret\", or listing-fee cost questions. Do not hand-roll Etsy OAuth or guess at API headers, and do not reach for Apify/a third-party scraper for Etsy search — this skill has the exact working pattern and known gotchas for both our own shop management and public competitor search."
 category: "product"
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   agents: ["any"]
   related_skills: ["gumroad-api", "talos-product-launch-audit", "state-reconciliation"]
 ---
@@ -465,3 +465,25 @@ identically on any listing_id, ours or a competitor's.
 **Default to this endpoint for any future Etsy market-research need before
 reaching for Apify or a third-party scraper** — it needs no new signup, no
 new credentials, and no separate spend cap to track.
+
+## Descriptions are plain text — and GET returns them HTML-escaped (2026-10-06)
+
+Two traps found auditing the live shop:
+
+1. **Etsy renders descriptions as plain text.** `**bold**` and `### Heading`
+   reach buyers literally. 8 of 15 live listings had this. Use
+   `platforms.etsy.etsy_plain_text(text)` (headings -> CAPS lines, bold
+   stripped, `-`/`*` bullets -> `• `, links/backticks flattened, entities
+   unescaped); `EtsyPublisher.create/update` now apply it automatically.
+   `EtsyShop.update_listing` still rejects Markdown outright unless
+   `allow_markdown=True`, so pass text through `etsy_plain_text` first.
+2. **GET returns `'` as `&#39;`** (and `&` as `&amp;`). That is output
+   escaping, not stored text — never copy a fetched title/description back
+   into a write without `html.unescape()`, or the entity gets stored
+   literally. `EtsyShop.update_listing` now compares title/description
+   unescaped; before this fix, any text containing an apostrophe raised a
+   false `EtsyVerifyError` even though the write had landed. If a verify
+   error fires on an apostrophe, re-GET the listing before retrying.
+
+Audit one-liner: for every active listing, flag descriptions matching
+`\*\*|^#{1,6}\s` — zero hits expected.

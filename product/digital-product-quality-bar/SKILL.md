@@ -178,6 +178,16 @@ close the quality gap).
       access issues, sharing/licensing).
 - [ ] No unbacked superlatives ("ultimate," "best," "perfect") — replace
       with the specific, checkable claim they're standing in for.
+- [ ] **Plain text only — no Markdown in the Etsy description.** Etsy does
+      not render Markdown: `**bold**` and `### Heading` show to buyers as
+      literal asterisks and hashes (found live 2026-10-06 on 8 of 15
+      listings: emergency binder, planners, coloring books, wall art).
+      Write section labels in CAPS and bullets as `• `. Mechanical check:
+      description must not match `\*\*|^#{1,6}\s`. Pipeline code runs
+      `platforms.etsy.etsy_plain_text()` on every create/update; a
+      hand-written listing-copy file still needs to be written this way.
+      Do not write back `&#39;`-style entities either: Etsy returns
+      apostrophes escaped on GET but takes plain `'` on write.
 
 ### 4. Category-specific checks
 
