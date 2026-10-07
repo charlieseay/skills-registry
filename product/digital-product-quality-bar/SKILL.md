@@ -411,3 +411,22 @@ thumbnail alone:**
    pulls real traffic and real competitor-saturation counts so the pick is
    data-driven, and checks same-day-batch suppression risk before you
    promote anything further.
+
+## Package, listing and live verification (added 2026-10-07)
+
+On 2026-10-07 the Christmas product's package held another product's PDFs, previews and listing text, and the task-written `check_listing.py` still passed because it only tested internal consistency. Retried tasks also overwrote listing copy that had already been reviewed. The rules that came out of it:
+
+1. **Bind the package to the product by hash.** Run `~/Projects/talos-tools/tools/verify_package.py <project> --forbid "<words from the other products>"`. It checks that every PDF in the zip is byte-identical to `dist/`, that the preview mockups equal `dist/previews`, and that no forbidden word appears in the listing, START-HERE or PDF text. A product's own check script must call it, not replace it.
+2. **Check the PDF text against the data, not only the data against itself.** Every mission, award or puzzle the listing mentions must appear in the rendered PDF.
+3. **Lock reviewed work.** After review, `chmod -R a-w` the product's `dist` and `phase-3` and create a `.LOCKED` file in the project folder. Retries and rewritten briefs will otherwise re-run over it.
+4. **Publish with `~/Projects/talos-tools/tools/etsy_publish_phase3.py`.** It runs the package check, refuses duplicates, publishes, re-reads the live listing (state, title, tags, price, type, category, ten images, the attached file) and sets the listing back to inactive if any of that differs. Printable party games belong in Etsy category 1350 (Party Games), not the old default 77.
+5. **Measure.** `tools/listing_metrics.py` runs daily. After a week under 20 views the title, tags and first preview get reworked; after three weeks with no sale it is a keep, reprice or retire decision. Sales are inferred from stock because the shop token lacks the `transactions_r` scope.
+
+## Reskinning an engine for a new theme (added 2026-10-07)
+
+Two themes (spy, space) shipped from the escape room engine in about an hour each, after the kitchen wording was turned into theme words. What mattered:
+1. Generalise by making every hardcoded label a theme word whose value for existing themes is the old text, then run `run_regression.py`; it proves the old products still rebuild identically. Do this before building the new theme.
+2. A reskin leaks old wording in places a text check will not catch (a leftover "(cousins)" label survived into the spy build). Look at a contact sheet of every page, not just the preview images, and grep the engine for words from the previous theme.
+3. A product's own scene or title can give away its answer (check_deliverable catches it); a themed word list used in an anagram puzzle must resolve to exactly one vocab word.
+4. Keep the puzzle arithmetic from the verified theme when reskinning; only the words change, so final codes stay hand-verifiable. Brute-force any new cryptarithm for uniqueness instead of trusting a hand design.
+5. Publish with the guarded script and record the listing in `tools/listings.json`; lock the folder afterwards.
