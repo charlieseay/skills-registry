@@ -299,3 +299,16 @@ Fal spend: $0.177 total. Specs and outputs are in each product's
 `phase-3/preview-mockups/` (`bg-fal-hero.png`, `hero-spec.json`,
 `hero-styled-01.jpg`, `*-spec.json`, `*-styled-02.jpg`). Copy a spec as the
 starting point for the next product in the same category.
+
+## 2026-10-14 — prefer the ZERO-COST path for backdrops
+
+The Fal.ai spend in this skill is for a *styled backdrop*. A generated
+linen/vignette backdrop composited in PIL costs nothing and tested
+indistinguishable at thumbnail size — see `etsy-preview-quality`, which has the
+working build (Playwright screenshots + PIL fan with real shadows + seal + bar).
+Reserve Fal.ai for **product artwork that must be recognisable** (see
+`product-illustration-generation`), not for decorative backgrounds.
+
+Also: always source preview pages from the LISTING BEING BUILT. Reusing one
+theme's screenshots across six themed listings produced a "Spy Mission" hero
+showing Christmas pages.

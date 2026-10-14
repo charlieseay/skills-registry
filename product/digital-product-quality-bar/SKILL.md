@@ -430,3 +430,49 @@ Two themes (spy, space) shipped from the escape room engine in about an hour eac
 3. A product's own scene or title can give away its answer (check_deliverable catches it); a themed word list used in an anagram puzzle must resolve to exactly one vocab word.
 4. Keep the puzzle arithmetic from the verified theme when reskinning; only the words change, so final codes stay hand-verifiable. Brute-force any new cryptarithm for uniqueness instead of trusting a hand design.
 5. Publish with the guarded script and record the listing in `tools/listings.json`; lock the folder afterwards.
+
+---
+
+## 2026-10-14 — Three hard gates added after a catalogue audit
+
+A full promise-vs-deliverable audit of 15 live listings found the gaps below.
+These are now enforced in `qa_gate.py`; this section records WHY so nobody
+relaxes them.
+
+### Gate 1 — document deliverables are deduped (was: auto-pass)
+`check_substance_floor()` collected only `.svg/.png/.jpg/.jpeg`. For a product
+shipping `.html`/`.docx`/`.pdf`, `total == 0` and it returned an unconditional
+`True`, and omitted `distinct_assets`, which fed `None` into
+`check_listing_claims_true()` and disabled that too. **One missing extension
+list defeated BOTH gates.** product-item-149 shipped 11 byte-identical HTML
+templates and a false "two-page variants" claim under `overall: PASS`.
+Now: html/docx/pdf/xlsx/csv/txt/md are hashed (html normalised, docx hashed on
+`word/document.xml` because zip mtimes differ per build) and duplicates FAIL.
+
+### Gate 2 — artwork must be visually reviewed (nothing could catch this)
+`check_illustrations_reviewed()` requires `phase-4/visual-review.md` with a
+`REVIEWED:` line for any product shipping >= 8 images. **Whether an
+illustration DEPICTS ITS LABEL is semantic; no hash can test it.**
+product-item-223 shipped 64 "picture-based toddler cards" whose art was
+hand-coded Pillow primitives — "Put On Pajamas" was a hexagon, "Brush Teeth" a
+diagonal bar — and passed because all 64 files hashed differently.
+Generate the review with `tools/visual_review.py` (local Ollama vision on the
+M5, zero cost). Verified: the model returns NO for the old hexagon
+("a light green, somewhat coffin-shaped polygon ... does not show pajamas")
+and YES for the replacement.
+
+### Gate 3 — check a name->function map for ALIASING
+`icon_lib.py` mapped `hands-wash-2`/`-3`, `toothbrush-2`, `comb-2`, `bath-2`,
+`book-2`, `heart-2` to the SAME function, so different cards drew identical
+pictures while the card JSON looked correct (64 ids, 0 reuse). Distinct ids do
+not imply distinct output. Check the dispatch table, not just the data.
+
+### Preview images must show THIS product
+Rebuilding six escape-room heroes from one theme's page screenshots produced a
+"Spy Mission" hero showing Christmas pages ("Master Bakers", a stocking,
+"Little Elves"). Always source preview pages from the listing being built.
+
+### Price against comps, and pull the TOP PERFORMERS
+Median alone misleads. For Montessori the median said $5.49 while the
+49k-view listing charged $9.98 and the 62k-view winner $19.98. See
+`etsy-preview-quality` for the comp-pull call.
