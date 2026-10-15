@@ -1,64 +1,49 @@
 ---
 name: verify-user-outcome
-description: Before calling a feature "tested" or "done," verify it from the user's actual vantage point — the visible outcome they'd see — not just the API/data contract underneath it. Use this after writing tests for any feature with a UI or user-visible behavior, before claiming a passing test suite means the feature works, and especially for state-change features (toggles, defers, moves-between-buckets) where the API can succeed while the visible result is wrong. Triggers on "tests pass", "I tested this", "e2e passing", or right before marking a feature done off test results alone.
+description: Before calling anything done, tested, shipped, fixed or live, check the outcome the way its user would actually see it, not the signal underneath (a passing test, an HTTP 200, a success message, a status field, a file that exists). Use when tests pass, a deploy finished, a listing or product was published, a skill/config/lane was changed, a script reported success, or right before telling Charlie something works. Triggers on "tests pass", "done", "shipped", "it's live", "deployed", "fixed", "published", "verified".
 ---
 
-# Verify User Outcome, Not Just the Contract
+# Verify the User's Outcome
 
-## Why this exists
+Every piece of work has someone it's for: a buyer opening a download, a person
+clicking a button, an agent loading a skill, Charlie reading a report. "Done"
+means that person sees the right result. Everything short of that (a green test,
+a 200, a script's "0 errors", status=shipped, a file that exists) is a signal
+that usually correlates with the outcome. It isn't the outcome.
 
-A Bridge defer-note feature shipped with 6 E2E tests and 25 unit tests, all
-passing, and still had a real UX-breaking bug surface hours later: the
-tests confirmed the API contract (a defer call succeeds, returns the right
-shape) but never checked the actual visible outcome the feature exists to
-produce — does the row actually move to the deferred bucket after a real
-defer call, from the same place a user would look?
+## The check (before saying done)
 
-This isn't a missing-test-coverage problem in the usual sense (more tests
-of the same kind wouldn't have caught it) — it's a **vantage-point**
-problem. Every one of those 31 tests was asking "did the API do the right
-thing," and none were asking "does the thing the user is looking at now
-look right." Those are different questions, and a feature can pass every
-instance of the first while failing the second.
+1. **Name the user and the moment.** Who consumes this, and where do they look?
+   The public URL, not localhost. The live listing, not the upload response. The
+   skill list an agent actually sees, not the registry row. The PDF opened in a
+   real viewer, not the script that generated it.
+2. **Look there, the way they would.** Open it, click it, read it, run the exact
+   command shown to them. For anything visual, look at the pixels. For anything
+   with a count or claim ("15 templates", "fixed", "7 personas"), count or test it.
+3. **Compare to the claim.** Does what you see match what you're about to report?
+   Quote the evidence: what you opened and what it showed.
+4. **Check what could undo it.** Could the result be reverted, overwritten,
+   hidden or never reached? A process that didn't reload new code, a retry that
+   rewrites reviewed files, a cache in front of the change, a config the running
+   service ignores, an item that reappears from another view.
+5. **Report the evidence, not the signal.** "Live listing shows 6 images, hero
+   is the new one" beats "upload succeeded".
 
-## The check
+## Signals that are not outcomes
 
-Before treating a state-change feature as verified, name the answer to two
-different questions and confirm both are covered:
+| Signal | What it misses | Check instead |
+|---|---|---|
+| Tests pass | Tests may assert the contract (API returned 200) but not the visible result | Would the suite still pass if the re-render, propagation or final step broke? If yes, it isn't testing the outcome |
+| HTTP 200 / health ok | The page renders while everything behind it is dead | Exercise the real function (a real request, the real integration) |
+| Script reports success | It reports what it attempted, not what landed | Inspect the side effect directly (live API, file contents, readlink) |
+| Status = shipped / QA pass | The producing agent's own check can pass on wrong output | Open the deliverable; check it's the right product, complete, not placeholder |
+| File exists, right size | Could be a stub, a duplicate, or the wrong product | Open it; compare against the claim |
+| Pushed / committed | The running process still has old code | Restart, confirm a fresh PID, re-test the original symptom |
+| Config changed | The service may ignore unknown values or fall back silently | Confirm from the service's own log or behavior which value it used |
 
-1. **Contract question:** did the API/function call succeed and return the
-   expected shape? (Usually what unit/integration tests already check.)
-2. **Outcome question:** after this action, does the thing the user would
-   actually be looking at reflect the change? Not "did the endpoint return
-   200" — did the row move, did the badge update, did the item disappear
-   from the list it's supposed to leave and appear in the one it's supposed
-   to join?
+## UI state changes
 
-A test suite that only answers question 1 is not incomplete in volume — it's
-answering a different question than "does this feature work." Adding more
-tests of the same kind (more contract assertions) doesn't close this gap;
-only a test that inspects the same view/state a real user would inspect
-does.
-
-## Where this bites hardest: state-change features
-
-Toggles, defers, moves-between-buckets, status transitions — anything where
-the "correct" outcome is defined by *where something ends up*, not just
-*whether a call succeeded*. For these specifically:
-
-- Trace the full path a real user action takes: click → API call → state
-  update → re-render → what's now visible. Test needs to reach the last
-  step, not stop at the API call.
-- If the test asserts on the API response body rather than the resulting
-  UI/list state, that's the tell that it's answering the contract question
-  only.
-- Ask: "if I broke the re-render step but left the API untouched, would
-  this test suite still pass?" If yes, it isn't testing the outcome.
-
-## Relationship to test-plan
-
-This isn't a replacement for the `test-plan` skill — that skill's "verify
-from the user's actual vantage point" principle is the general version of
-this. This skill exists as a sharper, narrower trigger specifically for
-"I already wrote tests and they pass, am I actually done" — the moment
-where it's easiest to stop one question short.
+For toggles, moves between lists, deferrals and status transitions, the outcome
+is where the item ends up. Trace click → API → state → re-render → what's
+visible, and test to the last step. Full guidance and the incident behind it:
+`references/ui-state-change-tests.md`.
