@@ -1,0 +1,1 @@
+{"id": "talos-brief-001", "prompt": "Write a brief or paste a task JSON, and the skill will check it for common gate failures.", "rubric": [], "must_not": [], "expected_present": null, "expected_absent": null, "held_out": false, "category": "real-case", "source": "placeholder"}
