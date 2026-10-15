@@ -193,9 +193,3 @@ Large, bold section headers that overlap content areas. Numbers and stats displa
 
 **Anti-patterns check:** ✓ No Inter as display, ✓ No purple gradients, ✓ Asymmetric layout, ✓ Custom styling
 ```
-
-## Lessons
-
-- **2026-06-15** — `research_the_actual_ui_pattern_before_co`: Research the actual UI pattern before coding automation - dont assume based on mobile screenshots _(context: Mobile screenshots showed skill input that looked like autocomplete. Coded entire autocomplete interaction pattern. Web search of Freelancer support docs revealed it's actually category-based checkboxes, not free-text input. All the autocomplete code was wrong. Lesson: Use WebSearch to find official docs/support pages that explain the actual UI pattern before writing any code.)_ [src: task-unknown]
-- **2026-06-16** — `ui-button-label-vs-action-mismatch`: Verify a UI action button calls the action its LABEL implies. A 'SUBMIT BID' button calling queue_bid (loop-back to Bid Pending) silently never advanced drafts. Check onclick action == label intent. _(context: Bridge bid-review 'SUBMIT BID' called queue_bid not submit_bid -> approving a draft looped it back instead of submitting. Feature existed; was just mis-wired + starved by the broken board.)_ [src: session/2026-06-16-bridge]
-- **2026-06-22** — `domain_aware_lesson_filtering`: Lesson routing now validates domain relevance before appending to skill files. Prevents cross-contamination where infrastructure/security lessons land in frontend skills just because they touched a React codebase. _(context: frontend-aesthetics had 11 lessons, only 2 were about frontend design. Rest were CVE fixes, security headers, iOS builds. Added SKILL_DOMAINS map + _is_lesson_relevant() check using NVIDIA fast tier.)_ [src: session/2026-06-22-skill-improvement]

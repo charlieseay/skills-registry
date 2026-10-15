@@ -92,7 +92,3 @@ The tailored resume must read like a **one-page document** when printed to PDF. 
 - After reviewing, the user can print to PDF from the browser
 
 ARGUMENTS: $ARGUMENTS
-
-## Lessons
-
-- **2026-06-16** — `voice-needs-fast-llm-not-nvidia-first`: Latency-sensitive callers (voice assistants) must route to a FAST provider (ask_llm groq/cerebras) and bound the call with a timeout, NOT the NVIDIA-first ask_helmsman chain which can take 20-30s when NVIDIA stalls. _(context: SoniqueBar handleConversation shelled to ask_helmsman -> 20s hang. Switched to ask_llm --lane fast + timeout 12 -> 0.5s.)_ [src: session/2026-06-16-sonique]

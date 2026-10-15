@@ -86,18 +86,3 @@ Once all 5 return, for each finding, launch a Haiku agent:
 > Adversarially verify this finding. Try to REFUTE it. Score 0-100 based on: Is it real? Is it new? Is it important? Return score with reasoning.
 
 Filter to findings ≥ 80, format as markdown report, present to user.
-
-## Lessons
-
-- **2026-06-15** — `task_completed__review_and_revise_brief`: Task completed: Review and revise brief for Task #1000457 [src: task-1000492]
-- **2026-06-15** — `task_completed__review_task__1000467`: Task completed: Review task #1000467 [src: task-1000545]
-- **2026-06-15** — `executor_timeout__420s____task_timed_out`: executor timeout (420s) — task timed out repeatedly, needs review [src: task-1000549]
-- **2026-06-15** — `executor_timeout__420s____task_timed_out`: executor timeout (420s) — task timed out repeatedly, needs review [src: task-1000580]
-- **2026-06-15** — `18_violations_found_and_written_to__tmp_`: 18 violations found and written to /tmp/hone-opener-violations.json [src: task-1000624]
-- **2026-06-15** — `file_created_with_scored_table_and_top_3`: File created with scored table and top 3 revenue candidates identified. Task complete. [src: task-1000635]
-- **2026-06-15** — `executor_timeout__1800s____task_timed_ou`: executor timeout (1800s) — task timed out repeatedly, needs review [src: task-1000719]
-- **2026-06-15** — `task_completed__cve_fix__starlette_in_nv`: Task completed: CVE fix: starlette in nvidia-agent-svc (GHSA-86qp-5c8j-p5mr HIGH) [src: task-1000737]
-- **2026-06-15** — `task_completed__review_and_revise_brief`: Task completed: Review and revise brief for classifying inactive n8n workflows (redispatch x2) [src: task-1000772]
-- **2026-06-15** — `task_completed__review_and_revise_brief`: Task completed: Review and revise brief for Task #1000457 [src: task-1000492]
-- **2026-06-15** — `task_completed__review_task__1000467`: Task completed: Review task #1000467 [src: task-1000545]
-- **2026-06-15** — `executor_timeout__420s____task_timed_out`: executor timeout (420s) — task timed out repeatedly, needs review [src: task-1000549]

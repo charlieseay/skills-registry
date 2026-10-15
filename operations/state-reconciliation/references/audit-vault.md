@@ -111,9 +111,3 @@ For each piece of drift found, offer to fix the vault note:
 - If a project has no tests configured, report "no tests" rather than failing
 - The vault path contains spaces — always quote it in commands
 - This skill is designed to run weekly but can be run anytime
-
-## Lessons
-
-- **2026-06-16** — `monitoring_doc_drift_false_alarms`: Before declaring a service 'DOWN', check it against REALITY not the CLAUDE.md port table — docs drift. A container 'Up' with an unpublished port is proxy-only (not broken); a missing service may be decommissioned (not down). _(context: Audit flagged Grafana(:3000)+Netdata(:19999) DOWN. Truth: grafana is Up but port unpublished (proxy-accessed); netdata doesn't exist + isn't in current infra notes (retired). Same class as bedrock-router :5700->:5683 drift.)_ [src: session/2026-06-15-trust]
-- **2026-06-16** — `status-vocab-drift-3-layers`: When a downstream UI doesn't show items, check status-vocabulary drift across ALL layers: the source DB statuses, the n8n column list, AND the Bridge's KNOWN_STATUSES/JobStatus/column-order. An unknown status gets silently coerced to 'Queued' and disappears. Fix every layer. _(context: 7 'Ready for Delivery' deliverables + Scored/Bid Failed were invisible: n8n STATUS_COLUMNS dropped them AND Bridge KNOWN_STATUSES coerced them to Queued. Fixed all 3 layers.)_ [src: session/2026-06-16-bridge]
-- **2026-06-16** — `status-schema-vocab-drift-recurring`: When a UI/dashboard shows nothing or wrong data, the #1 suspect is status/schema-vocabulary drift across layers: source DB statuses vs the query's column list vs the consumer's known-status set. Unknown values get silently coerced (->Queued) or dropped. Check + fix EVERY layer. _(context: Recurred 3x this session: restored endpoints w/o their views; n8n STATUS_COLUMNS vs Bridge KNOWN_STATUSES; centaur statuses vs Bridge JobStatus. Each made real data invisible.)_ [src: session/2026-06-16-meta]

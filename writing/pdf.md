@@ -153,7 +153,3 @@ Chrome headless is the standard PDF export method on this Mac. No extra tools ne
 - Obsidian wikilinks (`[[target]]`, `[[target|label]]`) should be stripped to plain text before conversion
 - Mermaid diagrams are always rendered to PNG and embedded — never show placeholder text in PDFs
 - The source `.md` file is never modified — all transformations happen on the in-memory copy
-
-## Lessons
-
-- **2026-06-15** — `task_completed__cve_fix__weasyprint_in_s`: Task completed: CVE fix: weasyprint in stripe-mcp (CVE-2025-68616 HIGH) [src: task-1000735]

@@ -190,8 +190,3 @@ If the procedure needs to be undone, follow these steps in reverse order:
 - Frontmatter follows the project's YAML frontmatter standard with runbook-specific fields added
 - The `review_cadence` field defaults to `quarterly` — the user can change it after creation
 - Steps in the SOP section always pair a command with expected output and a verification check
-
-## Lessons
-
-- **2026-06-15** — `w5_completed_manually_this_session___run`: W5 completed manually this session — runbooks written, n8n drill PASSED, commit 8b7814b. Closing stale workspace_busy entry. [src: task-1000560]
-- **2026-06-15** — `w5_completed_manually_this_session___run`: W5 completed manually this session — runbooks written, n8n drill PASSED, commit 8b7814b. Closing stale workspace_busy entry. [src: task-1000560]

@@ -126,7 +126,3 @@ Output:
 - Use today's date for both `created` and `updated` frontmatter fields
 - The `superseded_by` field is left empty — it gets filled in later if another ADR replaces this one
 - Do NOT auto-open the file — just report the path
-
-## Lessons
-
-- **2026-06-15** — `intent_recorded_as_outcome_is_a_recurrin`: Intent-recorded-as-outcome is a recurring failure. Sonique 2026-06-11: a prior session recorded file rewrites as done but bash heredocs never hit disk (app still ran old code). Also: new .swift file on disk != compiled (needs pbxproj registration); new code path may be shadowed by an earlier router match (screenshot intent shadowed the agentic path — debug print never fired). ALWAYS: grep the expected symbol, prove with a build, trace where the request actually routes, commit immediately. Never sed-edit pbxproj (plutil round-trip + lint). [src: task-unknown]

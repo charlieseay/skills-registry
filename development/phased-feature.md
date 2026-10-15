@@ -291,8 +291,3 @@ Recommend one. Get approval before Phase 5.
 ### Phase 5: Implementation
 [Specific deliverables based on approved architecture]
 ```
-
-## Lessons
-
-- **2026-06-15** — `when_a_feature_call_fails_at_runtime__ve`: When a feature call fails at runtime, verify the backend endpoint actually exists before debugging the client. ls src/pages/api/<feature>/ and git log --name-only to confirm files were actually committed. [src: task-unknown]
-- **2026-06-16** — `feature-starved-of-data-not-missing`: Before building a 'missing' feature, check if it already EXISTS but is starved of data or mis-wired. The bid-review and deliverable-review UIs both existed — they showed nothing because the board was empty (ssh bug) + a button was mis-wired. Verify the data path + wiring before writing new UI. _(context: Spent effort thinking bid/deliverable review needed building; both were fully built, just data-starved by the broken board + one mis-wired button.)_ [src: session/2026-06-16-meta]

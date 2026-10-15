@@ -102,7 +102,3 @@ project: Project Name
 - Do not auto-open the file — just report the path
 - This skill is environment-agnostic: it uses the current working directory, not a hardcoded vault path
 - If a file with the same name already exists, warn the user and ask before overwriting
-
-## Lessons
-
-- **2026-06-16** — `notes-scattered-need-canonical`: Each project needs ONE canonical note; others link to it, never duplicate. Scattered notes cause stale/wrong info + slow lookups. The housekeeper must enforce this. _(context: Bridge notes split across 5+ locations this session caused exactly the stale-info problem Charlie flagged. Housekeeper isn't keeping notes organized.)_ [src: session/2026-06-16-housekeeper]

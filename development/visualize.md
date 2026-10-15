@@ -235,8 +235,3 @@ Before writing the file:
 - The HTML file is portable — it can be opened from the vault, shared via FileBrowser, or committed to git
 - Re-running `/visualize` on the same project overwrites the previous `component-map.html`
 - The visualization is a snapshot — it reflects the codebase at generation time, not live state
-
-## Lessons
-
-- **2026-06-15** — `task_completed__w6_dependency_cve_sweep`: Task completed: W6 Dependency CVE Sweep — Phase 1 Research & Design [src: task-1000440]
-- **2026-06-15** — `task_completed__w6_dependency_cve_sweep`: Task completed: W6 Dependency CVE Sweep — Phase 1 Research & Design [src: task-1000440]
