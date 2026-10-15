@@ -254,3 +254,14 @@ happens in a separate task" rather than fight the checker.
 - [ ] Every path uses the owner's allowed convention (tilde-relative for TALOS, no literal `charlieseay/` segments, no `/Volumes/data/secrets`).
 - [ ] No bare filename references to unrelated files in prose.
 - [ ] After filing, poll the task's `status` a few seconds later — don't trust the initial POST response alone.
+
+## Traps found 2026-10-07 (each cost a failed filing or a wasted run)
+
+- **A path with a slash and a `.md`, `.json`, `.py` (and similar) extension in Context or Steps is read as an input file that must already exist.** `listing/listing.json` is read as `/listing.json` and the compile gate fails. Name a file the task creates by its bare name, or "a file named X in the Y folder", and list the real path only in Expected Output.
+- **Expected Output must contain something concrete in backticks** (an absolute path, a filename, a value). A bare prose list of files fails the fast path with a confusing "missing sections" list.
+- **Every command in the Verification bash block must exit 0**, so a negative control that is supposed to fail goes in a separate ```text fence, never in the bash block. Commands run without a shell: no pipes, `&&`, `>` or `~` expansion, except a `cd ~/path` on its own line, then relative commands.
+- **Output directories named in the brief must exist before filing.**
+- **TALOS cannot create priority 1 or 2 tasks** (max is 3).
+- **Do not write the word Canva in a brief that does not need Canva.** Routing sends any task whose authored text asks for work "in Canva" to the Canva-only lane, which has no web, shell or file tools.
+- **A folder containing a `.LOCKED` file is refused by the executor** (reviewed or published products). Remove the marker deliberately before a task may change it.
+- **A task's own check script is not proof.** See the package-verification section in `digital-product-quality-bar`.

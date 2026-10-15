@@ -61,7 +61,7 @@ near-duplicates are how a KB stops being trustworthy.
 
 ## Phase 2 — Knowledge capture
 
-- Write/update lesson files for anything lesson-worthy that wasn't already captured mid-session (`Projects/<project>/Lessons/<Title>.md`). The standing rule says capture-when-solved, so this is a sweep for stragglers, not the primary mechanism.
+- Record anything lesson-worthy that wasn't captured mid-session in helmsman (`POST http://localhost:5682/lessons`, which the KB sync publishes hourly). Do NOT write `Projects/<project>/Lessons/*.md` in the vault — the vault is historical-only since 2026-08-31. The standing rule says capture-when-solved, so this is a sweep for stragglers, not the primary mechanism.
 - Post one-line summaries of new lessons to #b3ck (`slack-post-filtered b3ck "..." --priority=low`).
 - Push lessons that ALL agents need into the helmsman lessons table (`POST http://localhost:5682/lessons`).
 - Update auto-memory: new/changed standing facts → memory files + MEMORY.md index. Correct any memory entries the session proved wrong.
@@ -69,7 +69,7 @@ near-duplicates are how a KB stops being trustworthy.
   agent searches):
   ```bash
   # Current project state — one per project touched:
-  kb write -n projects -t "<Project> HANDOFF" -f "Projects/<Project>/HANDOFF.md"
+  kb write -n handoffs -t "<Project> HANDOFF" -f ~/Projects/<repo>/HANDOFF.md   # repo handoff, handoffs notebook — never the vault copy
 
   # Lessons worth sharing beyond this session:
   kb write -n lessons -t "<short rule>" --text "<rule + why + how to apply>"
@@ -96,7 +96,7 @@ near-duplicates are how a KB stops being trustworthy.
 
 - Overwrite `## Session State` in the active project note(s): where things stand, what's verified vs pending, exact resume point.
 - Update the master project file's `## Last Session` entry (operator, work completed, decisions, issues, next actions).
-- Append the session summary to `Projects/AI Handoff.md` ("Pick-up after YYYY-MM-DD session" section) so Gemini/next-session Claude can resume cold.
+- Write the pick-up note to the KB so the next session (any agent) resumes cold: `kb write -n handoffs -t "Tomorrow <YYYY-MM-DD> — <focus>" --file <note>`. Anything that needs Charlie's hands goes in his queue as a decision — `POST http://localhost:5682/decisions` with type "approval", a WHY / DO / PROVE / CONTEXT body, and actions_json — which is what Bridge → My Tasks (http://192.168.68.78:8117/my-tasks) renders. CHARLIE is never a task owner; the task API rejects it. Do not append to `Projects/AI Handoff.md` (historical).
 
 ## Phase 4 — Open-loop sweep
 
@@ -106,7 +106,7 @@ near-duplicates are how a KB stops being trustworthy.
 
 ## Phase 5 — Checkpoint
 
-Run the `/checkpoint` skill (full multi-repo sweep — it handles commits, pushes, PDFs, container freshness, AI Handoff regeneration). This commits everything Phases 1–4 produced.
+Run the `/checkpoint` skill (full multi-repo sweep — it handles commits, pushes, PDFs, container freshness). This commits everything Phases 1–4 produced.
 
 ## Output — the Wrap-Up Report
 

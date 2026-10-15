@@ -69,12 +69,51 @@ A comprehensive report combining perspectives from:
 ## How It Works
 
 1. Skill parses your idea and optional context
-2. Invokes MCP `brainstorm` tool
-3. MCP server triggers n8n workflow
-4. n8n routes idea to all 7 agents in parallel (30-60 seconds)
-5. Synthesizer combines outputs
-6. Full report returned to you
-7. Session stored in Open-Notebook for reference
+2. POSTs to `brainstorm-agents-svc` at `http://localhost:5912/brainstorm`
+3. The service runs 6 personas concurrently, then the Synthesizer
+4. Full report returned to you
+5. Session stored in Open-Notebook for reference
+
+**Direct call** (the reliable path — no MCP round-trip):
+
+```bash
+curl -s -X POST http://localhost:5912/brainstorm \
+  -H 'Content-Type: application/json' \
+  -d '{"idea":"<the idea>","context":"<constraints, options, what you need decided>"}' \
+  --max-time 900 -o /tmp/bs.json
+```
+
+Budget up to 15 minutes. The 70B personas are the slow ones.
+
+Check it is up first: `curl -s localhost:5912/health`
+
+## Architecture — NOT n8n (changed 2026)
+
+This suite used to be described as an n8n workflow at
+`localhost:5680/webhook/brainstorm`. **That path is dead** and the workflow was
+never imported. Per `brainstorm-agents-svc/README.md`, it moved to its own
+service because:
+
+- n8n executes parallel branches **serially** — 6 agents took ~275s summed
+- Bedrock needs SigV4 signing, impractical inside an n8n Code node
+- `bedrock-claude-worker` (:5900) is single-flight and 503s on concurrent calls —
+  it is Helmsman's task runner, not a general LLM proxy
+- Ollama on shared hardware serializes heavy 14B calls (~400s under 6-way load)
+
+Curling the old webhook returns HTTP 000. That is a stale doc, not a broken
+capability — **probe :5912 before concluding the suite is down.**
+
+## Provider routing
+
+| Persona | Provider | Model |
+|---|---|---|
+| Visionary, Red Team | NVIDIA NIM | `meta/llama-3.1-70b-instruct` |
+| Practical, Skeptical | NVIDIA NIM | `meta/llama-3.1-8b-instruct` |
+| UX Advocate, Financial, Synthesizer | Bedrock | `us.anthropic.claude-haiku-4-5-...` |
+
+Routing lives in `ROUTE` in `server.py`. Persona prompts/temperature/max_tokens
+are read live from `Agents/Brainstorming/*.json` — editing a persona takes
+effect on the next request, no restart.
 
 ## Single Agent Mode
 
@@ -89,41 +128,40 @@ What's the UX Advocate's take on <idea>?
 
 ## Requirements
 
-- ✅ MCP server configured (automatic)
-- ⏳ n8n workflow imported (manual step)
-- ✅ nvidia-agent-svc running
-- ✅ Ollama running on ThinkPad
+- ✅ `brainstorm-agents-svc` running on :5912 (launchd: `com.seayniclabs.brainstorm-agents-svc`)
+- ✅ NVIDIA NIM key present (`/health` reports `nvidia_key: true`)
+- ✅ Bedrock credentials for the Haiku personas
+
+Restart it with:
+```bash
+launchctl load ~/Library/LaunchAgents/com.seayniclabs.brainstorm-agents-svc.plist
+tail -f /tmp/brainstorm-svc.log
+```
 
 ## Implementation
 
-The skill does the following:
-
-1. **Parse arguments:**
-   - Extract idea from user input
-   - Extract optional `--context` flag
-
-2. **Invoke MCP tool:**
-   ```python
-   # MCP brainstorm tool auto-invoked when skill is run
-   # Tool makes HTTP POST to: http://localhost:5680/webhook/brainstorm
-   ```
-
-3. **Format response:**
-   - Present synthesis in readable format
-   - Include session ID
-   - Link to full report in Open-Notebook (when available)
-
+1. **Parse arguments** — extract the idea and optional `--context`
+2. **POST to :5912/brainstorm** with `{idea, context?, session_id?}`
+3. **Format the response** — lead with the synthesis, then the persona sections
 4. **Error handling:**
-   - If n8n workflow not found → Show helpful setup message
-   - If timeout → Explain workflow is still processing
-   - If partial agent failure → Show available perspectives
+   - Connection refused → the service is down; check launchctl and the log
+   - Timeout → raise `--max-time`; 70B personas are slow under load
+   - Partial failure → the response still carries the personas that answered;
+     report which ones are missing rather than presenting a partial panel as complete
+
+## Writing up the results
+
+Give each persona its own voice. The value is in **disagreement between
+perspectives** — where the Visionary and the Red Teamer conflict is the finding.
+Collapsing seven views into one consensus paragraph throws away what you paid
+for. Say which persona said what.
 
 ## Status
 
-- ✅ Skill created
-- ✅ MCP server deployed
-- ⏳ n8n workflow (ready for import)
-- ⏳ Open-Notebook integration (future)
+- ✅ Skill live
+- ✅ brainstorm-agents-svc deployed (:5912), 7 personas loaded
+- ✅ Sessions stored in the `brainstorming` open-notebook notebook
+- ❌ n8n path retired — see Architecture above
 
 ## Notes
 

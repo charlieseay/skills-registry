@@ -1,6 +1,6 @@
 ---
 name: writing-rules
-description: Enforce Charlie's voice and writing standards on all public-facing documents
+description: Enforce Charlie's voice and writing standards, and remove AI-generated writing patterns. Use when creating any public-facing document (README, blog post, product copy), editing text to sound more human, or reviewing whether content matches Seaynic Labs standards or contains AI tells (em dashes, vague attribution, rule-of-three, superficial -ing analyses, em dashes, promotional language, passive voice, hedging, filler phrases).
 trigger: auto
 ---
 
@@ -210,3 +210,51 @@ If the hook detects violations:
 4. Document must be **fixed before proceeding**
 
 No exceptions. No "good enough". Either it follows the rules or it doesn't publish.
+
+---
+
+## AI Writing Patterns Reference
+
+This section documents AI-generated writing patterns to detect and remove. Based on Wikipedia's "Signs of AI writing" guide maintained by WikiProject AI Cleanup. Use this when humanizing text or verifying that content does NOT contain AI tells.
+
+### Quick Detection Checklist
+
+Before humanizing, scan for these clusters (one in isolation is not proof; multiple together are a confession):
+
+- [ ] Em dashes (—) or spaced double-hyphens (` -- `)
+- [ ] Vague quantifiers ("many", "most", "some")
+- [ ] Passive voice or subjectless fragments
+- [ ] Hedging ("might", "perhaps", "could potentially")
+- [ ] Filler phrases ("in order to", "due to the fact that")
+- [ ] Rule of three structures (grouping ideas artificially)
+- [ ] Overstated significance ("marks a pivotal moment", "testament to")
+- [ ] Promotional language ("vibrant", "stunning", "breathtaking")
+- [ ] Superficial -ing analyses ("highlighting", "showcasing", "emphasizing")
+- [ ] Vague attribution ("experts argue", "industry reports")
+- [ ] Elaborate copula substitution ("serves as" instead of "is")
+- [ ] Elegant variation / synonym cycling (repeating same concept with different words)
+- [ ] AI vocabulary words used in clusters ("landscape", "tapestry", "interplay", "delve", "foster")
+
+### Detailed Pattern Reference
+
+See `humanizer-patterns.md` in this directory for comprehensive documentation of 33 AI writing patterns with examples and fixes. Patterns include:
+
+- **Content patterns:** Undue emphasis, vague attributions, superficial analyses, promotional language
+- **Language patterns:** Copula avoidance, passive voice, elegant variation, false ranges, hedging
+- **Style patterns:** Em dash overuse, boldfacing, title case, emojis, curly quotes
+- **Communication patterns:** Chatbot courtesy phrases, knowledge-cutoff disclaimers, sycophancy
+- **Filler and hedging:** Generic conclusions, hyphenated pairs, persuasive authority tropes, signposting
+
+### Humanization Process
+
+When asked to humanize text:
+
+1. **Scan for patterns** — Look for clusters of tells above, not isolated ones
+2. **Identify violations** — Mark each AI pattern found
+3. **Preserve information** — Keep all facts, names, numbers, dates, quotes; only reshape presentation
+4. **Match voice** — Fit the intended tone (formal, casual, technical)
+5. **Add personality** — Only for voice-appropriate content (essays, blogs, opinion) — NOT for technical/reference material
+6. **Remove em dashes** — Hard rule: final text contains zero em dashes (—) or en dashes (–) unless user's own writing sample uses them
+7. **Self-check** — Verify no new facts were invented; confirm em dashes are gone
+
+**Never invent facts:** Every claim, name, number, date, quote, or citation in the rewrite must exist in the source. Swapping vague for specific is allowed only if the specific comes from the source or the user.
