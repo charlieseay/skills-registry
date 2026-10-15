@@ -653,3 +653,7 @@ Same cycle: RED (baseline) → GREEN (write skill) → REFACTOR (close loopholes
 Same benefits: Better quality, fewer surprises, bulletproof results.
 
 If you follow TDD for code, follow it for skills. It's the same discipline applied to documentation.
+
+## Eval cases are part of the skill (2026-10-15)
+
+A skill without evals can't be improved, only rewritten. Every new or substantially edited skill ships with 5–8 cases in `/Volumes/data/skills/_evals/<skill-name>/cases.jsonl`, taken from real past tasks where the skill applied (transcripts, helmsman tasks, lessons), including ones that went wrong. Mark 2 of them `"held_out": true`. Prefer deterministic graders (must-mention, must-not-mention, regex) over an LLM rubric. Format and runner: `~/Projects/claude-config/bin/skill-evals/README.md`. Run the baseline with and without the skill. If the skill shows no measurable delta, the skill (or its cases) needs work before it ships.
