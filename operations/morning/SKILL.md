@@ -1,6 +1,6 @@
 ---
 name: morning
-description: Run the mandatory session-start sequence deterministically — rules registry query, knowledge base query, project handoff retrieval, task sweep, and session health check, in a fixed order with no steps skipped or reordered under time pressure. Use this at the start of every working session, when the user says "let's get started," "what's the status," "morning," "session check," or any variant, and whenever CLAUDE.md's Session Start section would otherwise be reconstructed from memory rather than followed exactly.
+description: Run the mandatory session-start sequence deterministically — rules registry, knowledge base, project handoff, task sweep, in a fixed order with no steps skipped or reordered under time pressure. Use this at the start of every working session, when the user says "let's get started," "what's the status," "morning," or any variant, and whenever CLAUDE.md's Session Start section would otherwise be reconstructed from memory rather than followed exactly.
 ---
 
 # Morning / Session Start
@@ -83,21 +83,8 @@ run all five commands this session, that's the failure mode this skill
 exists to prevent — go back and run the ones you skipped before reporting
 status to the user.
 
-### 6. Session Health Check
-
-```bash
-~/.local/bin/claude-session-start-check
-```
-
-This command queries the Rules Registry again and reports scope/enforcement details, confirming the registry is reachable and that all golden rules loaded successfully.
-
-**When to run:**
-- At session start (after step 5 above)
-- After `/checkpoint` to verify no new rules were added
-- Before `/compact` (already in PreCompact hook)
-
 ## After the sweep
 
-Summarize what steps 2–6 actually returned (rules count, KB hits, handoff
-state, pending task count, and session health status) before doing anything else. This summary is the
+Summarize what steps 2–5 actually returned (rules count, KB hits, handoff
+state, pending task count) before doing anything else. This summary is the
 proof the sequence ran, not just a courtesy.
