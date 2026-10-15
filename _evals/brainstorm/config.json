@@ -1,4 +1,0 @@
-{
-  "optimize": false,
-  "reason": "brainstorm is a launcher for brainstorm-agents-svc. With it loaded, a text-only model writes the /brainstorm invocation instead of reasoning (2026-10-15 baseline: 0.00 train with skill vs 0.74 without). Still measured weekly as a signal; never sent to the optimizer, which would rewrite a tool launcher into a thinking guide."
-}
