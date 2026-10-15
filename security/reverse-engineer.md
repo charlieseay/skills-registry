@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer
-description: Expert reverse engineering — binary analysis, disassembly, decompilation, protocol extraction and vulnerability research across IDA Pro, Ghidra, radare2, x64dbg, angr and modern RE toolchains. Use for executable/library analysis, undocumented software or protocol comprehension, CTF challenges, security research, or troubleshooting/fixing behavior only visible in compiled code. Triggers: reverse engineer, RE, disassembly, decompilation, protocol extraction, undocumented API, malware analysis, vulnerability research, IDA, Ghidra, radare2, angr.
+description: Expert reverse engineering and binary analysis — disassembly, decompilation, static binary methodology (ELF, Mach-O, PE, JVM, .NET, Python bytecode), protocol extraction and vulnerability research across IDA Pro, Ghidra, radare2, x64dbg, angr and modern RE toolchains. Use for executable/library analysis, undocumented software or protocol comprehension, CTF challenges, security research, static-binary-only analysis without execution, or troubleshooting/fixing behavior only visible in compiled code. Triggers: reverse engineer, RE, disassembly, decompilation, binary analysis, static analysis, extract binary intelligence, ELF, Mach-O, PE, JVM bytecode, .NET assembly, protocol extraction, undocumented API, malware analysis, vulnerability research, IDA, Ghidra, radare2, angr.
 metadata:
   source: https://github.com/majiayu000/claude-skill-registry (skills/security/reverse-engineer)
   license: MIT
@@ -10,6 +10,120 @@ metadata:
 
 <!-- Vendored from https://github.com/majiayu000/claude-skill-registry (skills/security/reverse-engineer) (MIT). Body preserved verbatim; frontmatter description
      rewritten with fleet-wide trigger vocabulary so all agents auto-discover it. -->
+     Merged with binary-analysis-greenfield (static methodology for compiled artifacts without execution).
+
+# Static Binary Analysis Methodology
+
+Extract behavioral intelligence from compiled artifacts when source code is unavailable. Static analysis only — the binary is never executed.
+
+## When This Mode Applies
+
+Binary analysis activates when:
+- The target is a compiled artifact with no source code available
+- Discovery identifies compiled binaries at the target path
+- Other modes discover compiled artifacts during analysis (e.g., a bundled native binary inside an npm package)
+
+## Binary Type Taxonomy
+
+| Artifact Type | Format | Survey Tools | Decompiler | Decompilation Quality | Default Confidence |
+|--------------|--------|-------------|------------|----------------------|-------------------|
+| Native binaries | ELF, Mach-O, PE | `file`, `readelf`/`otool`/`objdump`, `nm`, `strings` | Ghidra, radare2 (disassembly only) | N/A (no source recovery) | `assumed` |
+| JVM bytecode | `.class`, `.jar`, `.war` | `jar tf`, `javap -public`, manifest extraction | CFR, Procyon, FernFlower | Very high | `inferred` |
+| .NET assemblies | `.dll`, `.exe` (managed) | `dotnet ildasm`, type enumeration, attributes | ILSpy (`ilspycmd`) | Very high | `inferred` |
+| Python bytecode | `.pyc`, `.pyo` | Magic number inspection, `strings` | uncompyle6, decompyle3, pycdc | Very high | `inferred` |
+| Electron apps | `.asar` bundles | `npx asar extract`, `package.json` | N/A (lossless source recovery) | Lossless | `inferred` |
+| WebAssembly | `.wasm` | `wasm-tools print`, export/import enumeration | `wasm2wat` (text format only) | Limited | `assumed` |
+
+### Step 1: Survey First
+
+Always start with lightweight binary surveying. The survey:
+- Identifies the binary type and selects the right tool chain
+- Extracts everything accessible through lightweight tools (strings, symbols, metadata)
+- Determines which modules warrant the cost of deep analysis
+- Attempts decompilation for managed code
+
+### Step 2: Strings Are Gold
+
+Embedded strings are the highest-value, lowest-effort source of behavioral intelligence. They provide direct evidence:
+- **Error messages** reveal validation rules, failure modes, and error handling
+- **URLs and endpoints** reveal API surface and external dependencies
+- **Configuration keys** reveal tunable parameters
+- **Regex patterns** reveal input validation rules
+
+Extract strings early. Categorize them. Cross-reference during deep analysis.
+
+### Step 3: Managed Code Gets Decompiled
+
+JVM, .NET, Python, and Electron artifacts preserve enough metadata for high-quality decompilation. When decompilation succeeds, use source code analysis on the decompiled result.
+
+### Step 4: Native Binaries Get Deep Disassembly
+
+For native code (ELF, Mach-O, PE) where decompilation is unreliable:
+1. Select target functions based on surveyor recommendations
+2. Disassemble with Ghidra (headless) or radare2
+3. Trace control flow and express as behavioral decision trees
+4. Map data structures from memory access patterns
+5. Identify algorithms from instruction patterns and constants
+
+### Step 5: Document Gaps Explicitly
+
+Binary analysis frequently produces incomplete pictures. Include a "Gaps in Analysis" section listing what could NOT be determined and why.
+
+## Tool Reference — Native Binaries (ELF)
+
+```bash
+file target.bin                        # Magic-based type identification
+readelf -h target.bin                  # ELF header
+readelf -S target.bin                  # Section headers
+nm target.bin                          # Symbol table
+strings -a -n 4 target.bin            # ASCII strings
+objdump -d --section=.text target.bin  # Disassemble text section
+```
+
+## Tool Reference — Native Binaries (Mach-O)
+
+```bash
+otool -h target.bin                    # Mach-O header
+otool -l target.bin                    # Load commands
+otool -L target.bin                    # Linked libraries
+```
+
+## Tool Reference — Disassemblers
+
+```bash
+# Ghidra headless mode
+$GHIDRA_HOME/support/analyzeHeadless /tmp/ghidra-project project-name \
+  -import target.bin -postScript ExportDisassembly.java
+
+# radare2: function disassembly
+r2 -q -c 'aaa; pdf @ sym.main' target.bin
+
+# radare2: function list
+r2 -q -c 'aaa; afl' target.bin
+```
+
+## Tool Reference — JVM
+
+```bash
+jar tf target.jar                      # List contents
+java -jar cfr.jar target.jar --outputdir decompiled/  # Decompile
+```
+
+## Tool Reference — .NET
+
+```bash
+dotnet ildasm target.dll               # Type/method listing
+ilspycmd target.dll -o decompiled/     # Decompile to C#
+```
+
+## Tool Reference — Electron/ASAR
+
+```bash
+npx asar list app.asar                 # List contents
+npx asar extract app.asar extracted/   # Extract (lossless)
+```
+
+---
 
 # Common RE scripting environments
 - IDAPython (IDA Pro scripting)
