@@ -137,14 +137,28 @@ npx asar extract app.asar extracted/   # Extract (lossless)
 - Triton (dynamic binary analysis)
 ```
 
+## Tooling: REA MCP
+
+REA (Reverse Engineer Anything) is an MCP server with 207 tools for static analysis of JavaScript/Electron apps, native binaries, web bundles, WASM, APKs, and firmware without execution. Use it when you need:
+
+- **Lossless source recovery from bundled JavaScript apps** (`.asar`, bundled Electron, web bundles)
+- **Binary metadata extraction** (strings, symbols, headers) without decompilers
+- **Managed code decompilation** (JVM, .NET, Python bytecode)
+- **Version comparison and source-to-bundle integrity verification**
+- **Web dependency graphs** from captured network bundles
+- **WASM interface inspection** and export enumeration
+
+See `/Volumes/data/skills/infrastructure/mcp-rea/SKILL.md` for full tool list, provider requirements, and common analysis patterns.
+
 ## Use this skill when
 
 - Working on common re scripting environments tasks or workflows
 - Needing guidance, best practices, or checklists for common re scripting environments
+- Performing static-only analysis of binaries, Electron apps, or web bundles (REA MCP is available)
 
 ## Do not use this skill when
 
-- The task is unrelated to common re scripting environments
+- The task is unrelated to reverse engineering or binary analysis
 - You need a different domain or tool outside this scope
 
 ## Instructions
