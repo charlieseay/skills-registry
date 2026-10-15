@@ -1,0 +1,64 @@
+{
+  "skill": "verify-user-outcome",
+  "file": "/Volumes/data/skills/development/verify-user-outcome/SKILL.md",
+  "judge": {
+    "provider": "ollama",
+    "model": "gemma3:27b"
+  },
+  "generator": {
+    "provider": "ollama",
+    "model": "qwen3:30b-a3b-instruct-2507-q4_K_M"
+  },
+  "before": {
+    "train": {
+      "with": 0.444,
+      "without": 0.361,
+      "delta": 0.083
+    },
+    "held_out": {
+      "with": 0.5,
+      "without": 0.833,
+      "delta": -0.333
+    }
+  },
+  "after": {
+    "train": {
+      "with": 0.306
+    },
+    "held_out": {
+      "with": 0.667
+    }
+  },
+  "regressions": [],
+  "growth": 0.117,
+  "gate": {
+    "held_out_gain": true,
+    "no_regressions": true,
+    "size_ok": true
+  },
+  "edits": [
+    {
+      "type": "add",
+      "after": "A test suite that only answers question 1 is not incomplete in volume \u2014 it's answering a different question than \"does this feature work.\"",
+      "text": "Consider how the feature's outcome might be *reverted* or appear elsewhere in the system, even after the primary action is complete."
+    },
+    {
+      "type": "add",
+      "after": "If the test asserts on the API response body rather than the resulting UI/list state, that's the tell that it's answering the contract question only.",
+      "text": "Always trace the full user flow \u2013 from UI interaction, through the API call, to the final visible result \u2013 and confirm the test suite exercises this entire path."
+    },
+    {
+      "type": "modify",
+      "old_text": "Ask: \"if I broke the re-render step but left the API untouched, would this test suite still pass?\" If yes, it isn't testing the outcome.",
+      "new_text": "Ask: \"if I bypassed or altered any step *after* the API call (re-rendering, data propagation, side effects) would this test suite still pass?\" If yes, it isn't testing the outcome."
+    }
+  ],
+  "skipped_edits": [],
+  "reasoning": "The skill emphasizes verifying the user-visible outcome, but the failures show a tendency to stop at simple state changes without considering broader system implications or full user flows. These edits reinforce the need to think about edge cases like data re-appearance, complete flow coverage, and potential bypasses of later stages in the process.",
+  "status": "not_recommended",
+  "original_sha256": "e37c6b6bcc909ba68a3d66d93efc7fe38b11c324ff1530418693320bdab00810",
+  "new_text": "---\nname: verify-user-outcome\ndescription: Before calling a feature \"tested\" or \"done,\" verify it from the user's actual vantage point \u2014 the visible outcome they'd see \u2014 not just the API/data contract underneath it. Use this after writing tests for any feature with a UI or user-visible behavior, before claiming a passing test suite means the feature works, and especially for state-change features (toggles, defers, moves-between-buckets) where the API can succeed while the visible result is wrong. Triggers on \"tests pass\", \"I tested this\", \"e2e passing\", or right before marking a feature done off test results alone.\n---\n\n# Verify User Outcome, Not Just the Contract\n\n## Why this exists\n\nA Bridge defer-note feature shipped with 6 E2E tests and 25 unit tests, all\npassing, and still had a real UX-breaking bug surface hours later: the\ntests confirmed the API contract (a defer call succeeds, returns the right\nshape) but never checked the actual visible outcome the feature exists to\nproduce \u2014 does the row actually move to the deferred bucket after a real\ndefer call, from the same place a user would look?\n\nThis isn't a missing-test-coverage problem in the usual sense (more tests\nof the same kind wouldn't have caught it) \u2014 it's a **vantage-point**\nproblem. Every one of those 31 tests was asking \"did the API do the right\nthing,\" and none were asking \"does the thing the user is looking at now\nlook right.\" Those are different questions, and a feature can pass every\ninstance of the first while failing the second.\n\n## The check\n\nBefore treating a state-change feature as verified, name the answer to two\ndifferent questions and confirm both are covered:\n\n1. **Contract question:** did the API/function call succeed and return the\n   expected shape? (Usually what unit/integration tests already check.)\n2. **Outcome question:** after this action, does the thing the user would\n   actually be looking at reflect the change? Not \"did the endpoint return\n   200\" \u2014 did the row move, did the badge update, did the item disappear\n   from the list it's supposed to leave and appear in the one it's supposed\n   to join?\n\nA test suite that only answers question 1 is not incomplete in volume \u2014 it's\nanswering a different question than \"does this feature work.\" Adding more\n\nConsider how the feature's outcome might be *reverted* or appear elsewhere in the system, even after the primary action is complete.\ntests of the same kind (more contract assertions) doesn't close this gap;\nonly a test that inspects the same view/state a real user would inspect\ndoes.\n\n## Where this bites hardest: state-change features\n\nToggles, defers, moves-between-buckets, status transitions \u2014 anything where\nthe \"correct\" outcome is defined by *where something ends up*, not just\n*whether a call succeeded*. For these specifically:\n\n- Trace the full path a real user action takes: click \u2192 API call \u2192 state\n  update \u2192 re-render \u2192 what's now visible. Test needs to reach the last\n  step, not stop at the API call.\n- If the test asserts on the API response body rather than the resulting\n  UI/list state, that's the tell that it's answering the contract question\n  only.\n\nAlways trace the full user flow \u2013 from UI interaction, through the API call, to the final visible result \u2013 and confirm the test suite exercises this entire path.\n- Ask: \"if I bypassed or altered any step *after* the API call (re-rendering, data propagation, side effects) would this test suite still pass?\" If yes, it isn't testing the outcome.\n\n## Relationship to test-plan\n\nThis isn't a replacement for the `test-plan` skill \u2014 that skill's \"verify\nfrom the user's actual vantage point\" principle is the general version of\nthis. This skill exists as a sharper, narrower trigger specifically for\n\"I already wrote tests and they pass, am I actually done\" \u2014 the moment\nwhere it's easiest to stop one question short.\n",
+  "diff": "--- a/SKILL.md\n+++ b/SKILL.md\n@@ -36,6 +36,8 @@\n \n A test suite that only answers question 1 is not incomplete in volume \u2014 it's\n answering a different question than \"does this feature work.\" Adding more\n+\n+Consider how the feature's outcome might be *reverted* or appear elsewhere in the system, even after the primary action is complete.\n tests of the same kind (more contract assertions) doesn't close this gap;\n only a test that inspects the same view/state a real user would inspect\n does.\n@@ -52,8 +54,9 @@\n - If the test asserts on the API response body rather than the resulting\n   UI/list state, that's the tell that it's answering the contract question\n   only.\n-- Ask: \"if I broke the re-render step but left the API untouched, would\n-  this test suite still pass?\" If yes, it isn't testing the outcome.\n+\n+Always trace the full user flow \u2013 from UI interaction, through the API call, to the final visible result \u2013 and confirm the test suite exercises this entire path.\n+- Ask: \"if I bypassed or altered any step *after* the API call (re-rendering, data propagation, side effects) would this test suite still pass?\" If yes, it isn't testing the outcome.\n \n ## Relationship to test-plan\n \n",
+  "created": "2026-10-15T16:27:19",
+  "review_note": "2026-10-15: held-out rose but train fell 0.44->0.31 and the skill still trails no-skill on held-out (0.67 vs 0.83). Fails the train_holds gate added the same day. Kept for reference."
+}
