@@ -1,6 +1,6 @@
 ---
 name: writing-rules
-description: Enforce Charlie's voice and writing standards on all public-facing documents
+description: "Enforce Charlie's voice and writing standards on all public-facing documents Also covers humanizer: remove AI tells, make text sound human, review for AI writing patterns."
 trigger: auto
 ---
 
@@ -210,3 +210,8 @@ If the hook detects violations:
 4. Document must be **fixed before proceeding**
 
 No exceptions. No "good enough". Either it follows the rules or it doesn't publish.
+
+## Mode: humanizer
+
+Remove signs of AI-generated writing (em dashes, rule of three, vague attribution, promotional words, filler) using the 33-pattern checklist.
+Full procedure: `/Volumes/data/skills/writing/writing-rules/references/humanizer.md`. Read it before running this mode.

@@ -1,6 +1,6 @@
 ---
 name: morning
-description: Run the mandatory session-start sequence deterministically — rules registry, knowledge base, project handoff, task sweep, in a fixed order with no steps skipped or reordered under time pressure. Use this at the start of every working session, when the user says "let's get started," "what's the status," "morning," or any variant, and whenever CLAUDE.md's Session Start section would otherwise be reconstructed from memory rather than followed exactly.
+description: "Run the mandatory session-start sequence deterministically — rules registry, knowledge base, project handoff, task sweep, in a fixed order with no steps skipped or reordered under time pressure. Use this at the start of every working session, when the user says \"let's get started,\" \"what's the status,\" \"morning,\" or any variant, and whenever CLAUDE.md's Session Start section would otherwise be reconstructed from memory rather than followed exactly. Also covers session-check: enforce golden rules and query the rules registry at session start."
 ---
 
 # Morning / Session Start
@@ -88,3 +88,8 @@ status to the user.
 Summarize what steps 2–5 actually returned (rules count, KB hits, handoff
 state, pending task count) before doing anything else. This summary is the
 proof the sequence ran, not just a courtesy.
+
+## Mode: session-check
+
+Rules-registry enforcement at session start: confirm the golden rules loaded, stop if the registry returns 0 rules.
+Full procedure: `/Volumes/data/skills/operations/morning/references/session-check.md`. Read it before running this mode.

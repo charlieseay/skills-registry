@@ -1,6 +1,6 @@
 ---
 name: state-reconciliation
-description: Verify a claimed state — a HANDOFF note, CMDB record, task status, "this was deleted/deployed/migrated," or any assertion about the current state of a system — against what is actually true right now, then close the gap. Use this whenever you are about to relay, report, or act on a status claim you haven't personally checked against a live source this session: "is X still running", "confirm Y was deleted", "did the migration finish", "what's the current state of Z", before writing anything into a HANDOFF or CMDB record, or before telling Charlie something is "done". Also use it proactively when a claim smells stale — a note that hasn't been touched in weeks but reads as current, or a "completed" status with no verification evidence attached. This is the general-purpose version of audit-vault (vault-notes-only) and branch-drift-sweep (git-only) — reach for this one for everything else: CMDB, containers, launchd, deployments, credentials, datastores.
+description: "Verify a claimed state — a HANDOFF note, CMDB record, task status, \"this was deleted/deployed/migrated,\" or any assertion about the current state of a system — against what is actually true right now, then close the gap. Use this whenever you are about to relay, report, or act on a status claim you haven't personally checked against a live source this session: \"is X still running\", \"confirm Y was deleted\", \"did the migration finish\", \"what's the current state of Z\", before writing anything into a HANDOFF or CMDB record, or before telling Charlie something is \"done\". Also use it proactively when a claim smells stale — a note that hasn't been touched in weeks but reads as current, or a \"completed\" status with no verification evidence attached. This is the general-purpose version of audit-vault (vault-notes-only) and branch-drift-sweep (git-only) — reach for this one for everything else: CMDB, containers, launchd, deployments, credentials, datastores. Triggers also: audit-vault, audit the vault, vault drift, project notes vs repos."
 ---
 
 # State Reconciliation
@@ -156,3 +156,8 @@ declaring success, which a fast read skips past.)
    the same way (`git log origin/main..HEAD --oneline | wc -l` == 0, no
    `<<<<<<<` markers anywhere in the tree, gitleaks clean) before reporting
    it done.
+
+## Mode: audit-vault
+
+Scan vault project notes against actual repo state and fix the drift.
+Full procedure: `/Volumes/data/skills/operations/state-reconciliation/references/audit-vault.md`. Read it before running this mode.

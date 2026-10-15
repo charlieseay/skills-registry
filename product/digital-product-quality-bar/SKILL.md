@@ -1,6 +1,6 @@
 ---
 name: "digital-product-quality-bar"
-description: "Concrete, checkable quality gate for Talos digital products (Notion templates, Canva packs, planners, coloring books, font/icon bundles) before they publish to Etsy/Gumroad — preview image count and content, listing copy structure, and whether the deliverable format itself (build-spec vs. ready-to-use) meets the real market bar. Use this whenever a product is approve-ready and about to publish, when a listing has real search traffic but converts poorly, or when comparing a listing against a successful competitor to find the actual gap."
+description: "Concrete, checkable quality gate for Talos digital products (Notion templates, Canva packs, planners, coloring books, font/icon bundles) before they publish to Etsy/Gumroad — preview image count and content, listing copy structure, and whether the deliverable format itself (build-spec vs. ready-to-use) meets the real market bar. Use this whenever a product is approve-ready and about to publish, when a listing has real search traffic but converts poorly, or when comparing a listing against a successful competitor to find the actual gap. Also covers product-quality-verify: verify a file or asset count, a unique/distinct claim, or whether a deliverable matches its listing."
 category: "product"
 metadata:
   version: "1.0.0"
@@ -476,3 +476,8 @@ Rebuilding six escape-room heroes from one theme's page screenshots produced a
 Median alone misleads. For Montessori the median said $5.49 while the
 49k-view listing charged $9.98 and the 62k-view winner $19.98. See
 `etsy-preview-quality` for the comp-pull call.
+
+## Mode: verify a product claim
+
+Verify a claim about a product's actual content: asset counts, 'unique' or 'distinct' claims, whether the deliverable matches the listing.
+Full procedure: `/Volumes/data/skills/product/digital-product-quality-bar/references/product-quality-verify.md`. Read it before running this mode.

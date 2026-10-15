@@ -1,6 +1,6 @@
 ---
 name: code-review-and-quality
-description: Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. Use when asked to review a diff or a pull request, even when the diff is pasted inline.
+description: "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. Use when asked to review a diff or a pull request, even when the diff is pasted inline. Also covers parallel-review: multi-agent code review with confidence scoring."
 ---
 
 # Code Review and Quality
@@ -396,3 +396,8 @@ After review is complete:
 - [ ] Dependency upgrades were reviewed against their changelog, isolated per package, and verified by a green suite with the lockfile diff reviewed
 
 **Presumptive blockers:** surface and propose the simpler design for each of these; escalate to Required only when the change actively makes structure worse: a refactor that relocates complexity instead of reducing it; a change that pushes a file past the size boundary with no decomposition; feature logic added to a shared module; a near-duplicate of an existing canonical helper; a silent fallback that hides an unclear invariant.
+
+## Mode: parallel-review
+
+Multi-agent review: several reviewers in parallel, findings merged with confidence scoring.
+Full procedure: `/Volumes/data/skills/development/addy-osmani/code-review-and-quality/references/parallel-review.md`. Read it before running this mode.
