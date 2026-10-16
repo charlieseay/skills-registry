@@ -277,6 +277,19 @@ These extend `etsy-api`'s "Replacing the hero" section:
 5. `DELETE /shops/{shop_id}/listings/{listing_id}/images/{listing_image_id}`
    returns 204 and the delete applies. The re-fetch confirmed it every time.
 
+### Setting an exact image order: `etsy_order.py` (added 2026-10-16)
+Because of quirks 2 and 3, moving one image means re-uploading everything
+after it. `scripts/etsy_order.py <listing_id> <workdir> <item> ...` does
+that safely. Each item is an existing image id or `path::alt text` for a new
+image, and any image not named is deleted. It keeps the longest correct prefix,
+downloads the full-size originals of the images it has to move (keeping their
+alt text), deletes, re-uploads at explicit ranks, then re-fetches and exits
+non-zero unless the served order matches exactly. `before-<id>.json` in the
+workdir records the old order. It was used on 176, 177, 192, 214 and 225 on
+2026-10-16. Look at every image before you keep it: that pass found old prices
+($4.99 on $2.49 listings), internal "validation set" wording, an empty
+background and 570px duplicates.
+
 ### Verification: what counts as done
 - `GET /listings/{id}?includes=Images`: the first image is the new id at
   3000x3000, the old hero id is absent, and the count is what you expect.
