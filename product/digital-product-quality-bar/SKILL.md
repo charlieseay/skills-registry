@@ -280,6 +280,32 @@ honestly in the listing copy instead of the inflated total.
 - [ ] **Directory Structure Standard**: Every product directory on disk must use descriptive kebab-case slugs: `product-item-<num>-<descriptive-slug>`. Avoid bare numerical directory names to prevent ID collisions and missing-name fallbacks.
 - [ ] **QA Gate Enforcement**: `qa_gate.py`'s `no_internal_identifiers_in_customer_files` gate runs OCR scans across preview images and regex scans across all customer packages; any match on internal IDs causes an immediate hard FAIL.
 
+### 8. Mechanical gates added 2026-10-16: run them, don't re-derive them
+
+A 28-listing audit on 2026-10-16 found false claims that every earlier pass missed, because they were checked against the build folder instead of what buyers download. These checks are now code. A product is not ready until all of them pass:
+
+```bash
+cd /Volumes/data/projects/talos-tools/digital-products
+python3 qa_gate.py --product-dir <dir>              # product-level, live Etsy copy when listed
+python3 tools/listing_audit.py --listing <id>       # listing-level, records the pass in the CMDB
+```
+
+| Gate | What fails it (each one happened live) |
+|---|---|
+| `listing_copy_meets_standard` | No FAQ with 3+ `•` answers, no CAPS `WHAT'S INCLUDED` / `WHO IT'S FOR`, no nothing-ships line, mixed-case labels ("Perfect For:"), superlatives, Markdown, or any writing-rules `check.py` violation. Award names ("Best Predictor") are exempt. |
+| `fillable_claims_match_package` | The listing says "fillable" or "N fillable fields" and the PDFs **inside the shipped zip** don't have them. 181, 192 and 214 sold "fillable" with 0 fields because a rebuild zipped the flat print PDFs. |
+| `image_claims_backed_by_files` | An image spec says totals calculate and no shipped PDF has a calculated field (185). |
+| `package_found` | The Etsy download can't be matched byte-for-byte to a local zip, so nothing above was really checked. |
+| `image_resolution` | Any listing image under 2000px on its short side. Render previews at `device_scale_factor=2` (1000px layout, 2000px output); the preview engines do this since 2026-10-16. |
+| `image_text` | OCR finds placeholder or internal text ("YOUR BRAND HERE", "validation set to test market demand") or a printed price that differs from the live price ($4.99 on $2.49 listings). |
+| `image_review` | Nobody looked at the current images. Look at every image, then `listing_audit.py --reviewed <id>`. OCR can't see "6 GAMES" on a one-game product or a seal that says 8 sections on a 15-section binder. |
+
+Rules that came with these gates:
+- **Every number on the listing or an image comes from the shipped file.** Count pages, fields, cards and sizes in the zip, not in `phase-1/`, and not from the listing you're replacing.
+- **Hero seals and bars are claims.** `tools/hero-specs.json` feeds them. Change the spec when the product changes.
+- **A violation name must say which way it fails.** "no-bullets" was read as "bullets are banned" when it meant "bullets are missing". The standard requires bullets.
+- **Source can drift after publishing.** The Christmas dinner game's `build.py` at HEAD renders a different theme than the live product. Rebuild previews from the commit that produced the live package, and check the result against the live images before uploading.
+
 ## What to do about existing build-spec products
 
 Several already-published products (e.g. product-item-153, 158, 164) are

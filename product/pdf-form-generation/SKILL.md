@@ -186,6 +186,24 @@ final `render_layout.py` output directory — never consider a visual change
    pixels: `page.eval_on_selector("h1", "el => getComputedStyle(el).fontWeight")`
    during the Playwright render step settles it immediately.
 
+### Field-type bug: a field named `*_checkbox` that is really a text box (found 2026-10-16)
+
+The 52 Week Savings Tracker's generator named its 52 week fields `wN_checkbox` but built them as text fields (`/Tx`). On screen, a buyer had to type an "x" into a 12pt box while the listing said "tick each week". After building, assert the type, not just the count:
+
+```python
+from pypdf import PdfReader
+for a in PdfReader(out).pages[0]["/Annots"]:
+    a = a.get_object()
+    if str(a["/T"]).endswith("_checkbox"):
+        assert a["/FT"] == "/Btn", a["/T"]
+```
+
+`product-item-181/phase-1/make_checkboxes.py` converts existing text boxes into real checkboxes in place. It draws its own tick for the "on" appearance, so it has no font dependency.
+
+### Check the ZIP, not the folder
+
+The never-shipped bug above also hit packaging. On 2026-10-14, a rebuild zipped only the flat print PDFs for 181, 192 and 214, so 0 fillable fields went live under "Fillable PDF". Count fields inside the zip you upload. `qa_gate.py`'s `fillable_claims_match_package` does this, and a check against `phase-1/` proves nothing.
+
 ## Second recurring bug: `pdf-form-fields.json` path portability
 
 `render_layout.py` writes each page's `pdf_path` — if written as

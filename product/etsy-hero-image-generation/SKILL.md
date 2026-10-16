@@ -235,6 +235,21 @@ Use 3 pills. More than 3 shrinks the type below thumbnail legibility.
 - [ ] Downscale to 570px (the search-thumbnail size) and confirm the title still reads
 - [ ] Hero and infographic share the palette/fonts with each other
 
+### 7. Every seal and bar is a claim (added 2026-10-16)
+
+The 2026-10-16 audit found heroes that contradicted their own products:
+- bingo said "12 cards" (it has 30)
+- dinner games said "6 games" and "trivia, place cards" (each is one game with 36 missions)
+- wall art said "4 sizes" (it has 11)
+- a binder said "8 sections" (it has 15)
+- story games said "all ages" (they start at grade 2)
+
+Before building or uploading a hero or infographic:
+- Take every number and feature from the **shipped zip**: pages, fields, cards, sizes, sections. The `tools/hero-specs.json` entry and the infographic `items` must match it.
+- Read the listing description next to the image text. They must agree.
+- Render at 2000x2000 or larger. `build_hero.py` and `compose_listing_image.py` already do this. For HTML-rendered previews, use `device_scale_factor=2`.
+- After uploading, look at every image on the listing, not just the new one. On 2026-10-16 the image pass found old prices, internal "validation set" wording, a blank background and unrelated art that no hero change would have touched.
+
 ## Putting it on the live listing (read `etsy-api` first)
 
 ```bash

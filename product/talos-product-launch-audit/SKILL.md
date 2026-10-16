@@ -430,6 +430,25 @@ verification, not first-pass work. Concretely:
   checking them one at a time by hand — faster, and harder to accidentally
   skip one.
 
+## Don't re-audit what already passed (added 2026-10-16)
+
+Run `talos-tools/digital-products/tools/listing_audit.py` for the listing-level audit. It records every result on the product's CMDB row (`helmsman /projects/<id>`):
+- `audit_status`: `passed` or `failed`
+- `audit_fingerprint`: sha256 over the live title, description, tags, price, state, every image id and size, every download file id and size, and the version of the audit code
+- `audit_detail`: which checks ran, plus the failed detail
+- `last_audited_at`
+
+On the next run, a listing whose CMDB row says `passed` with the same fingerprint is **skipped**. Any edit, image swap, file replacement or change to the checks produces a new fingerprint, so only changed listings are audited again. That saves the time and tokens of repeating passed work (Charlie, 2026-10-16). Failed listings are never skipped.
+
+```bash
+python3 tools/listing_audit.py                  # whole shop; skips unchanged passes
+python3 tools/listing_audit.py --listing <id>   # one listing
+python3 tools/listing_audit.py --reviewed <id>  # after you LOOKED at its current images
+python3 tools/listing_audit.py --force          # ignore recorded passes
+```
+
+The visual review can't be automated away. Look at every image, then mark it reviewed. The fingerprint pins exactly which images were seen, so a new image needs a new look.
+
 ## Closing a cycle
 
 At the end of a pass, do ONE more completely fresh full-catalog sweep of
