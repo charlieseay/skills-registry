@@ -228,6 +228,17 @@ restart to pick up a code change (see below).
    than 2-3 times — if it's still failing identically, the content isn't
    the variable. Trace the actual gate code per step 1 above before
    burning further submission attempts.
+4. **"Phase check could not run" means the model calls failed, not your
+   brief.** Before 2026-10-16 this case was reported as "Steps mix research
+   (read) and modification (write)", which sent people rewording perfectly
+   read-only briefs. Cause that day: cerebras returned HTTP 402 (quota),
+   groq's gpt-oss-120b returned 429 (daily token limit), nvidia answered only
+   sometimes. The check now falls back to `ask_gemini` (subscription) and
+   says so honestly. If you see it, check providers, not wording:
+   ```bash
+   ASK_LLM_DEBUG=1 ~/Projects/claude-config/bin/ask_llm 'Reply with {"ok": true}' --lane thinking
+   ```
+   Regression test: `~/Projects/claude-config/tests/brief-lint-phase-check-unavailable.sh`.
 
 ## Known trap: `check_expected_output`'s vague-claims word list has no negation awareness
 
