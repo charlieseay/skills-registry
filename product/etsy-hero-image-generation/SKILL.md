@@ -305,6 +305,8 @@ workdir records the old order. It was used on 176, 177, 192, 214 and 225 on
 ($4.99 on $2.49 listings), internal "validation set" wording, an empty
 background and 570px duplicates.
 
+**Size trap (found 2026-10-17):** when `etsy_order.py` moves an existing image, it re-uploads it from Etsy's `url_fullxfull`, and Etsy caps that at 3000px on the long side. A 2002x3432 page came back at 1750x3000 and failed the 2000px check. For any image over 3000px on its long side, pass the local original file path instead of its image id.
+
 ### Verification: what counts as done
 - `GET /listings/{id}?includes=Images`: the first image is the new id at
   3000x3000, the old hero id is absent, and the count is what you expect.
